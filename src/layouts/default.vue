@@ -6,5 +6,9 @@ import Sidebar from '@/components/adminSidebar.vue';
 <template>
     <Navbar />
     <Sidebar />
-    <slot></slot>
+    <div class="p-2 sm:ml-64">
+        <div class="p-2 mt-14">
+            <slot></slot>
+        </div>
+    </div>
 </template>

@@ -26,7 +26,7 @@ const transactions = ref([
 const books = ref([
     {
         label: 'Books',
-        icon: 'pi pi-palette',
+        icon: 'pi   pi-book',
         items: [
             {
                 label: 'Books List',
