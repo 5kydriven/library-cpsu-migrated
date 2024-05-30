@@ -31,7 +31,10 @@ import ToastService from 'primevue/toastservice';
 import Dialog from 'primevue/dialog';
 import InputMask from 'primevue/inputmask';
 import PanelMenu from 'primevue/panelmenu';
-
+import Splitter from 'primevue/splitter';
+import SplitterPanel from 'primevue/splitterpanel';
+import Skeleton from 'primevue/skeleton';
+import Carousel from 'primevue/carousel';
 
 const app = createApp(App)
 
@@ -55,6 +58,10 @@ app.component('OverlayPanel', OverlayPanel)
 app.component('Toast', Toast)
 app.component('Dialog', Dialog)
 app.component('PanelMenu', PanelMenu)
+app.component('Splitter', Splitter)
+app.component('SplitterPanel', SplitterPanel)
+app.component('Skeleton', Skeleton)
+app.component('Carousel', Carousel)
 
 app.use(PrimeVue, {
     unstyled: true,

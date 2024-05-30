@@ -50,7 +50,17 @@ const router = createRouter({
           component: () => import('../pages/transactions/BorrowedBooks.vue'),
         },
       ],
-    }
+    },
+    {
+      path: '/students-log',
+      name: 'students-log',
+      component: () => import('../pages/scanner/StudentsLogs.vue'),
+    },
+    {
+      path: '/borrower-log',
+      name: 'borrower-log',
+      component: () => import('../pages/scanner/BorrowerLogs.vue'),
+    },
   ]
 })
 
