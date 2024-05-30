@@ -27,7 +27,4 @@ coverage
 *.sln
 *.sw?
 
-.env
-/stores/firebase.js
-
 *.tsbuildinfo
