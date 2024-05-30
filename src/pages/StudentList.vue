@@ -31,7 +31,7 @@ onMounted(() => {
 });
 </script>
 <template>
-    <h1>Students List</h1>
+    <h1 class="text-2xl font-bold mb-4">Students List</h1>
     <DataTable :value="products" tableStyle="min-width: 50rem" v-model:filters="filters"
         :globalFilterFields="['name', 'quantity', 'code', 'category']" ref="dt" removableSort showGridlines stripedRows
         scrollable scrollHeight="500px">

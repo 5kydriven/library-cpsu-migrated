@@ -61,6 +61,11 @@ const router = createRouter({
       name: 'borrower-log',
       component: () => import('../pages/scanner/BorrowerLogs.vue'),
     },
+    {
+      path: '/portal',
+      name: 'portal', 
+      component: () => import('@/pages/StudentsPortal.vue')
+    }
   ]
 })
 

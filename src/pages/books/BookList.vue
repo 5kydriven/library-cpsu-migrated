@@ -1,10 +1,13 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { ProductService } from '../../service/productService.js';
+import ImportBooks from '@/components/booksComp/ImportBooks.vue';
 
 const products = ref();
 const filters = ref();
 const dt = ref();
+const dialogPosition = ref('center');
+const dialogVisible = ref(false);
 
 const initFilters = () => {
     filters.value = {
@@ -26,12 +29,21 @@ const exportCSV = () => {
     dt.value.exportCSV();
 };
 
+const openDialog = (pos) => {
+    dialogPosition.value = pos;
+    dialogVisible.value = true;
+}
+
+const onFormSuccess = (message) => {
+    toast.add({ severity: 'success', summary: 'Success', detail: message, life: 3000 });
+};
+
 onMounted(() => {
     ProductService.getProducts().then((data) => (products.value = data));
 });
 </script>
 <template>
-    <h1>Books List</h1>
+    <h1 class="text-2xl font-bold mb-4">Books List</h1>
     <DataTable :value="products" tableStyle="min-width: 50rem" v-model:filters="filters"
         :globalFilterFields="['name', 'quantity', 'code', 'category']" ref="dt" removableSort showGridlines stripedRows
         scrollable scrollHeight="500px">
@@ -40,7 +52,7 @@ onMounted(() => {
                 <div class="flex gap-2">
                     <Button type="button" icon="pi pi-filter-slash" label="Clear" outlined @click="clearFilter()" />
                     <Button icon="pi pi-external-link" label="Export" @click="exportCSV($event)" />
-                    <Button icon="pi pi-arrow-up" label="Import" />
+                    <Button icon="pi pi-arrow-up" label="Import" @click="openDialog('top')"/>
                 </div>
 
 
@@ -56,5 +68,14 @@ onMounted(() => {
         <Column field="name" sortable header="Name"></Column>
         <Column field="category" header="Category"></Column>
         <Column field="quantity" header="Quantity"></Column>
+        <Column header="borrowed"></Column>
+        <Column header="Actions"></Column>
     </DataTable>
+
+    <Dialog v-model:visible="dialogVisible" :style="{ width: '40rem' }" :position="dialogPosition"
+        :draggable="false" modal header="Import File">
+        <ImportBooks @formSuccess="onFormSuccess" />
+    </Dialog>
+
+    <Toast />
 </template>
