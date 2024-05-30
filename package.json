@@ -12,6 +12,8 @@
   "dependencies": {
     "firebase": "^10.12.2",
     "html5-qrcode": "^2.3.8",
+    "material-icons": "^1.13.12",
+    "papaparse": "^5.4.1",
     "pinia": "^2.1.7",
     "primeicons": "^7.0.0",
     "primevue": "^3.52.0",

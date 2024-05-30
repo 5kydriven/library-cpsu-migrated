@@ -1,7 +1,8 @@
-import './assets/main.css'
+import './assets/main.css';
 import PrimeVue from 'primevue/config';
 import aura from './presets/aura';
-import 'primeicons/primeicons.css'
+import 'material-icons/iconfont/material-icons.css';
+import 'primeicons/primeicons.css';
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
