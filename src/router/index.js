@@ -22,7 +22,7 @@ const router = createRouter({
     {
       path: '/user-portal',
       name: 'user-portal',
-      component: () => import('../pages/userPortal/userAuth.vue'),
+      component: () => import('../pages/userPortal/userAuth/userAuthPage.vue'),
     },
     {
       path: '/librarian',
