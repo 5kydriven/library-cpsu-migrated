@@ -1,6 +1,8 @@
 <script setup>
+import { db } from '@/stores/firebase.js';
 import { ref, onMounted } from 'vue';
 import { ProductService } from '../service/productService.js';
+
 
 const products = ref();
 const filters = ref();
@@ -29,10 +31,26 @@ const exportCSV = () => {
 onMounted(() => {
     ProductService.getProducts().then((data) => (products.value = data));
 });
+
+const getSeverity = (product) => {
+    switch (product.inventoryStatus) {
+        case 'INSTOCK':
+            return 'success';
+
+        case 'LOWSTOCK':
+            return 'warning';
+
+        case 'OUTOFSTOCK':
+            return 'danger';
+
+        default:
+            return null;
+    }
+};
 </script>
 <template>
     <h1 class="text-2xl font-bold mb-4">Students List</h1>
-    <DataTable :value="products" tableStyle="min-width: 50rem" v-model:filters="filters"
+    <DataTable :value="products"  paginator :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]" tableStyle="min-width: 50rem" v-model:filters="filters"
         :globalFilterFields="['name', 'quantity', 'code', 'category']" ref="dt" removableSort  stripedRows
         scrollable scrollHeight="500px">
         <template #header>
@@ -64,5 +82,10 @@ onMounted(() => {
         <Column field="name" sortable header="Name"></Column>
         <Column field="category" header="Category"></Column>
         <Column field="quantity" header="Quantity"></Column>
+        <Column header="Status">
+            <template #body="slotProps">
+                <Tag :value="slotProps.data.inventoryStatus" :severity="getSeverity(slotProps.data)" />
+            </template>
+        </Column>
     </DataTable>
 </template>
