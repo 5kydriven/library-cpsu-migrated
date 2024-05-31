@@ -34,14 +34,14 @@ onMounted(()=>{
                 <h1 class="text-lg p-5 text-center">OR</h1>
                 <div class="flex items-center gap-5 w-full">
                     <InputText id="username" class="w-96" placeholder="ex. (CPSU-LRC-0000)" v-model="value" aria-describedby="username-help" />
-                    <Button label="Submit" severity="info"/>
+                    <Button label="Submit" severity="success"/>
                 </div>
             </div>
-            <div class=" bg-white rounded-lg h-6/12 drop-shadow-sm"> 
+            <div class=" bg-white rounded-lg h-6/12 w-5/12 drop-shadow-sm"> 
                 <!-- <div> -->
-                    <div class="flex items-center p-5 shadow-md">
+                    <div class="flex items-center p-5 shadow-md  bg-gradient-to-l from-green-700 to-green-500 rounded-t-lg">
                         <img src="/logo.png" class="h-16 me-3" alt="CPSU Logo" />
-                        <h1 class="text-3xl font-semibold">CPSU LIBRARY SYSTEM</h1>
+                        <h1 class="text-3xl font-semibold text-white">CPSU LIBRARY SYSTEM</h1>
                     </div>
                     <div class="flex justify-center items-center h-96">
                         <!-- <div class="flex justify-center items-center h-80">
@@ -50,7 +50,7 @@ onMounted(()=>{
                                 </span>
                             </div>
                         </div> -->
-                        <div class="w-full max-w-sm p-5 m-10 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                        <div class="w-full max-w-sm py-10 m-10 bg-white border-gray-200 border-2 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700  bg-gradient-to-t from-white to-green-500 ">
 
                             <div class="flex flex-col items-center pb-10">
                                 <img class="w-24 h-24 mb-3 rounded-full shadow-lg" src="/logo.png" alt="Bonnie image"/>
