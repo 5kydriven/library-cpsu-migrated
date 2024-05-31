@@ -3,14 +3,19 @@ import { ref, onMounted } from 'vue';
 import { ProductService } from '../../service/productService.js';
 import ImportBooks from '@/components/booksComp/ImportBooks.vue';
 import { useToast } from 'primevue/usetoast';
+import { collection, query, where, onSnapshot, getDocs } from "firebase/firestore";
+import {db} from '@/stores/firebase.js'
 
 const toast = useToast();
-const products = ref();
+
+const books = ref();
 const filters = ref();
 const dt = ref();
 const dialogPosition = ref('center');
 const dialogVisible = ref(false);
 const op = ref();
+const loading = ref(false)
+const lazyParams = ref({});
 
 const initFilters = () => {
     filters.value = {
@@ -45,15 +50,29 @@ const onFormSuccess = () => {
     toast.add({ severity: 'success', summary: 'Success', detail: 'Successfully Imported', life: 3000 });
 };
 
+const loadLazyData = () => {
+    loading.value = true
+
+    onSnapshot(collection(db, "books"), (querySnapshot) => {
+        const book = [];
+        querySnapshot.forEach((doc) => {
+            book.push({ ...doc.data() });
+        });
+        books.value = book;
+        loading.value = false
+    });
+}
+
 onMounted(() => {
-    ProductService.getProducts().then((data) => (products.value = data));
+    loadLazyData();
 });
 </script>
+
 <template>
     <h1 class="text-2xl font-bold mb-4">Books List</h1>
-    <DataTable :value="products" tableStyle="min-width: 50rem" v-model:filters="filters"
-        :globalFilterFields="['name', 'quantity', 'code', 'category']" ref="dt" removableSort stripedRows
-        scrollable scrollHeight="500px">
+    <DataTable :value="books" tableStyle="min-width: 50rem" v-model:filters="filters" lazy :loading="loading"
+        :virtualScrollerOptions="{ itemSize: 46 }" :globalFilterFields="['name', 'quantity', 'code', 'category']"
+        ref="dt" removableSort stripedRows scrollable scrollHeight="500px">
         <template #header>
             <div class="flex justify-between">
                 <div class="flex gap-2">
@@ -70,15 +89,15 @@ onMounted(() => {
                 </span>
             </div>
         </template>
-        <template #empty> No customers found. </template>
+        <template #empty> No Books found. </template>
         <Column header="#">
             <template #body="slotProps">
                 {{ slotProps.index + 1 }}
             </template>
         </Column>
-        <Column field="name" sortable header="Title"></Column>
-        <Column field="category" header="College"></Column>
-        <Column field="quantity" header="Call Number"></Column>
+        <Column field="title" sortable header="Title"></Column>
+        <Column field="college" header="College"></Column>
+        <Column field="callNumber" header="Call Number"></Column>
         <Column header="borrowed"></Column>
         <Column header="Actions" class="text-center">
             <template #body="{ data }">
