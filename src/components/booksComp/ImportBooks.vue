@@ -12,16 +12,16 @@
     <div>
         <div>
             <DataTable :value="files" tableStyle="min-width: 20rem" v-show="files" removableSort paginator :rows="6">
-                <Column field="Name" header="Name" sortable></Column>
-                <Column field="Course" header="Course"></Column>
-                <Column field="Batch" header="Batch"></Column>
-                <Column field="Status" header="Status"></Column>
+                <Column field="sec" header="Name" sortable></Column>
+                <Column field="college" header="Course"></Column>
+                <Column field="author" header="Batch"></Column>
+                <Column field="publisher" header="Status"></Column>
                 <template #footer> In total there are {{ files ? files.length : 0 }} Alumni's </template>
             </DataTable>
         </div>
     </div>
 
-    <!-- <span v-show="store.dialogLoading"
+    <span v-show="dialogLoading"
         class="bg-gray-800/[.7] w-full h-full flex gap-2 flex-col items-center justify-center leading-none rounded-lg dark:bg-blue-900 dark:text-blue-200 absolute -translate-y-1/2 -translate-x-1/2 top-2/4 left-1/2">
         <div role="status">
             <svg aria-hidden="true" class="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-primary-500"
@@ -35,13 +35,15 @@
             </svg>
         </div>
         <label class="text-gray-50  rounded px-0.5 py-0.5 font-semibold ">"Please wait, this may take a moment."</label>
-    </span> -->
+    </span>
 
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import Papa from 'papaparse';
+import { db } from '@/stores/firebase.js';
+import { writeBatch, doc, collection } from "firebase/firestore";
 
 const emit = defineEmits(['formSuccess']);
 
@@ -54,13 +56,29 @@ const handleFileChange = (event) => {
     Papa.parse(file.value, {
         header: true,
         complete: (results) => {
-            let removeEmpty = []
-            results.data.forEach(row => {
-                if (row.Name && row.Name.trim() !== '') {
-                    removeEmpty.push({ ...row })
+            let removeEmpty = [];
+
+            // Lowercase the headers
+            const lowerCaseHeaders = results.meta.fields.map(field => field.toLowerCase());
+
+            // Transform the data to use lowercase headers
+            const transformedData = results.data.map(row => {
+                let newRow = {};
+                lowerCaseHeaders.forEach((header, index) => {
+                    newRow[header] = row[results.meta.fields[index]];
+                });
+                return newRow;
+            });
+
+            // Filter out rows with no values
+            transformedData.forEach(row => {
+                const hasValues = Object.values(row).some(value => value !== null && value !== '');
+                if (hasValues) {
+                    removeEmpty.push({ ...row });
                 }
             });
-            files.value = removeEmpty
+
+            files.value = removeEmpty;
         },
         error: (error) => {
             console.error('Error parsing CSV file:', error);
@@ -68,39 +86,53 @@ const handleFileChange = (event) => {
     });
 };
 
+
 const uploadFile = async () => {
-    if (!file.value) return;
+    dialogLoading.value = true;
+    const batch = writeBatch(db);
+    const booksCollection = collection(db, "books");
 
-    Papa.parse(file.value, {
-        header: true,
-        complete: async (results) => {
-            store.dialogLoading = true
-            try {
-                const response = await fetch('http://localhost:8080/uploadFile', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json' // Set content type to JSON
-                    },
-                    body: JSON.stringify(results.data) // Convert data to JSON string
-                });
+    files.value.forEach(fileData => {
+        const newDocRef = doc(booksCollection); // Automatically generates a unique ID
 
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
+        // Map CSV fields to Firestore properties
+        const cleanedData = {
+            section: fileData.sec || "Unknown Section",
+            college: fileData.college || "Unknown College",
+            subArea: fileData.subarea || "Unknown Sub Area",
+            notes: fileData["NOTE/Remarks"] || "",
+            subject: fileData.subject || "Unknown Subject",
+            callNumber: fileData.callnumber || "",
+            title: fileData.title || "Unknown Title",
+            author: fileData.author || "Unknown Author",
+            copyright: fileData.copyright === "true", // Assuming it's a boolean field
+            accountNumber: fileData.accountnumber || "",
+            additionalTitle: fileData.title_1 || "",
+            volume: fileData.volume || "",
+            additionalSubject: fileData.subject_1 || "",
+            publisher: fileData.publisher || "",
+            dealer: fileData.dealer || "",
+            price: parseFloat(fileData.price) || 0, // Assuming it's a numeric field
+            totalPrice: parseFloat(fileData.totalprice) || 0,
+            physDesc: fileData.physdesc || "",
+            bibliography: fileData["Bibliography/Notes"] || "",
+            isbn: fileData.isbn || "",
+            pubPlace: fileData.pubplace || "",
+            addedEntryTitle: fileData["AddedEntryTitle / Series Title"] || "",
+            remarks: fileData.remarks || "",
+        };
 
-                const result = await response.json();
-                store.dialogLoading = false
-                store.dialogVisible = false
-                emit('formSuccess', result.message)
-                files.value = null
-                file.value = null
-            } catch (error) {
-                console.error('Error uploading data:', error);
-            }
-        },
-        error: (error) => {
-            console.error('Error parsing CSV file:', error);
-        }
+        batch.set(newDocRef, cleanedData);
     });
+
+    try {
+        await batch.commit();
+        emit('formSuccess');
+    } catch (error) {
+        console.error('Error committing batch:', error);
+    }
+
+    
+    dialogLoading.value = false;
 };
 </script>

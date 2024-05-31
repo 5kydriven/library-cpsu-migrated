@@ -10,6 +10,16 @@ const router = createRouter({
       component: authPage
     },
     {
+      path: '/time-in-out',
+      name: 'user-log',
+      component: () => import('../pages/scanner/StudentsLogs.vue'),
+    },
+    {
+      path: '/borrower-log',
+      name: 'borrower-log',
+      component: () => import('../pages/scanner/BorrowerLogs.vue'),
+    },
+    {
       path: '/librarian',
       name: 'homepage',
       component: () => import('../pages/HomeView.vue'),
@@ -52,19 +62,9 @@ const router = createRouter({
       ],
     },
     {
-      path: '/students-log',
-      name: 'students-log',
-      component: () => import('../pages/scanner/StudentsLogs.vue'),
-    },
-    {
-      path: '/borrower-log',
-      name: 'borrower-log',
-      component: () => import('../pages/scanner/BorrowerLogs.vue'),
-    },
-    {
-      path: '/portal',
-      name: 'portal', 
-      component: () => import('@/pages/StudentsPortal.vue')
+      path: '/test',
+      name: 'test', 
+      component: () => import('@/pages/Test.vue')
     }
   ]
 })
