@@ -33,7 +33,7 @@ onMounted(() => {
 <template>
     <h1 class="text-2xl font-bold mb-4">Students List</h1>
     <DataTable :value="products" tableStyle="min-width: 50rem" v-model:filters="filters"
-        :globalFilterFields="['name', 'quantity', 'code', 'category']" ref="dt" removableSort showGridlines stripedRows
+        :globalFilterFields="['name', 'quantity', 'code', 'category']" ref="dt" removableSort  stripedRows
         scrollable scrollHeight="500px">
         <template #header>
             <div class="flex justify-between">
@@ -51,7 +51,16 @@ onMounted(() => {
             </div>
         </template>
         <template #empty> No customers found. </template>
-        <Column field="code" header="Code"></Column>
+        <Column header="Name" sortable sortField="name" class="flex items-center gap-3">
+            <template #body="slotProps">
+                <img :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.data.image}`" :alt="slotProps.data.image" class="w-[2.5rem] h-[2.5rem] shadow-md rounded-full" />
+                <div class="flex flex-col">
+                    <span>{{ slotProps.data.name }}</span>
+                    <span class="text-gray-400 text-sm font-thin">sample@gmail.com</span>
+                </div>
+            </template>
+        </Column>
+        <Column field="code" sortable="" header="ID"></Column>
         <Column field="name" sortable header="Name"></Column>
         <Column field="category" header="Category"></Column>
         <Column field="quantity" header="Quantity"></Column>
