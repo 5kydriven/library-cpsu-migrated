@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import authPage from '../pages/auth/authPage.vue'
+import UserAuthPage from '../pages/user_auth/UserAuth.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -8,6 +9,11 @@ const router = createRouter({
       path: '/',
       name: 'auth',
       component: authPage
+    },
+    {
+      path: '/user_auth',
+      name: 'user_auth',
+      component: UserAuthPage
     },
     {
       path: '/librarian',
