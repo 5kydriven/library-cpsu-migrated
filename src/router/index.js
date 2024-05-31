@@ -20,6 +20,11 @@ const router = createRouter({
       component: () => import('../pages/scanner/BorrowerLogs.vue'),
     },
     {
+      path: '/user-portal',
+      name: 'user-portal',
+      component: () => import('../pages/userPortal/userAuth.vue'),
+    },
+    {
       path: '/librarian',
       name: 'homepage',
       component: () => import('../pages/HomeView.vue'),
