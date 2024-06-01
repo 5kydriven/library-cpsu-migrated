@@ -1,29 +1,27 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { ProductService } from '../../service/productService.js';
+import { FilterMatchMode } from 'primevue/api';
 import ImportBooks from '@/components/booksComp/ImportBooks.vue';
 import { useToast } from 'primevue/usetoast';
-import { collection, query, where, onSnapshot, getDocs } from "firebase/firestore";
-import {db} from '@/stores/firebase.js'
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from '@/stores/firebase.js'
 
 const toast = useToast();
 
-const books = ref();
+const books = ref([]);
 const filters = ref();
-const dt = ref();
+// const dt = ref();
 const dialogPosition = ref('center');
 const dialogVisible = ref(false);
 const op = ref();
 const loading = ref(false)
-const lazyParams = ref({});
 
 const initFilters = () => {
     filters.value = {
-        global: { value: null, },
-        name: { value: null },
-        category: { value: null },
-        quantity: { value: null },
-        code: { value: null },
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        title: { value: null },
+        college: { value: null },
+        callNumber: { value: null },
     };
 };
 
@@ -37,8 +35,29 @@ const clearFilter = () => {
     initFilters();
 };
 
-const exportCSV = () => {
-    dt.value.exportCSV();
+const convertArrayToCSV = (data) => {
+    if (data.length === 0) return '';
+
+    // Get all unique keys from data
+    const headers = Array.from(new Set(data.flatMap(book => Object.keys(book))));
+
+    const csvRows = [
+        headers.join(','), // header row
+        ...data.map(book => headers.map(field => book[field] !== undefined ? JSON.stringify(book[field]) : '').join(',')) // data rows
+    ];
+
+    return csvRows.join('\n');
+};
+
+const exportAllCSV = () => {
+    const csvData = convertArrayToCSV(books.value);
+    const blob = new Blob([csvData], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'books.csv';
+    a.click();
+    URL.revokeObjectURL(url);
 };
 
 const openDialog = (pos) => {
@@ -47,11 +66,12 @@ const openDialog = (pos) => {
 }
 
 const onFormSuccess = () => {
+    dialogVisible.value = false;
     toast.add({ severity: 'success', summary: 'Success', detail: 'Successfully Imported', life: 3000 });
 };
 
 const loadLazyData = () => {
-    loading.value = true
+    loading.value = true;
 
     onSnapshot(collection(db, "books"), (querySnapshot) => {
         const book = [];
@@ -59,7 +79,7 @@ const loadLazyData = () => {
             book.push({ ...doc.data() });
         });
         books.value = book;
-        loading.value = false
+        loading.value = false;
     });
 }
 
@@ -70,17 +90,17 @@ onMounted(() => {
 
 <template>
     <h1 class="text-2xl font-bold mb-4">Books List</h1>
-    <DataTable :value="books" tableStyle="min-width: 50rem" v-model:filters="filters" lazy :loading="loading"
-        :virtualScrollerOptions="{ itemSize: 46 }" :globalFilterFields="['name', 'quantity', 'code', 'category']"
-        ref="dt" removableSort stripedRows scrollable scrollHeight="500px">
+    <DataTable :value="books" tableStyle="min-width: 50rem" v-model:filters="filters" :loading="loading"
+        :virtualScrollerOptions="{ itemSize: 46 }" :globalFilterFields="['title', 'college', 'callNumber', 'borrowed']"
+        removableSort stripedRows dataKey="id" scrollable scrollHeight="500px" filterDisplay="menu">
         <template #header>
             <div class="flex justify-between">
                 <div class="flex gap-2">
                     <Button type="button" icon="pi pi-filter-slash" label="Clear" outlined @click="clearFilter()" />
-                    <Button icon="pi pi-external-link" label="Export" @click="exportCSV($event)" />
+                    <!-- <Button icon="pi pi-external-link" label="Export Displayed" @click="exportCSV()" /> -->
+                    <Button icon="pi pi-external-link" label="Export All" @click="exportAllCSV()" />
                     <Button icon="pi pi-arrow-up" label="Import" @click="openDialog('top')" />
                 </div>
-
 
                 <span class="relative">
                     <i class="pi pi-search absolute top-2/4 -mt-2 left-3 text-surface-400 dark:text-surface-600" />
@@ -108,7 +128,7 @@ onMounted(() => {
                         <ul class="py-1 text-sm text-gray-700 dark:text-gray-200">
                             <li>
                                 <a href="#"
-                                    class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white "
+                                    class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                                     @click="showProfile">Show</a>
                             </li>
                             <li>

@@ -11,12 +11,12 @@
 
     <div>
         <div>
-            <DataTable :value="files" tableStyle="min-width: 20rem" v-show="files" removableSort paginator :rows="6">
-                <Column field="sec" header="Name" sortable></Column>
-                <Column field="college" header="Course"></Column>
-                <Column field="author" header="Batch"></Column>
-                <Column field="publisher" header="Status"></Column>
-                <template #footer> In total there are {{ files ? files.length : 0 }} Alumni's </template>
+            <DataTable :value="files" tableStyle="min-width: 20rem" v-show="files" removableSort paginator :rows="5">
+                <Column field="sec" header="Section" sortable></Column>
+                <Column field="college" header="College"></Column>
+                <Column field="title" header="Title"></Column>
+                <Column field="price" header="Price"></Column>
+                <template #footer> In total there are {{ files ? files.length : 0 }} Book's </template>
             </DataTable>
         </div>
     </div>
@@ -72,7 +72,8 @@ const handleFileChange = (event) => {
 
             // Filter out rows with no values
             transformedData.forEach(row => {
-                const hasValues = Object.values(row).some(value => value !== null && value !== '');
+                const hasValues = Object.values(row).some(value => value != null && value != '');
+                console.log(row)
                 if (hasValues) {
                     removeEmpty.push({ ...row });
                 }
@@ -95,6 +96,14 @@ const uploadFile = async () => {
     files.value.forEach(fileData => {
         const newDocRef = doc(booksCollection); // Automatically generates a unique ID
 
+        // Function to clean and parse price values
+        const parsePrice = (priceString) => {
+            if (typeof priceString === 'string') {
+                return parseFloat(priceString.replace(/,/g, '')) || 0;
+            }
+            return parseFloat(priceString) || 0;
+        };
+
         // Map CSV fields to Firestore properties
         const cleanedData = {
             section: fileData.sec || "Unknown Section",
@@ -105,15 +114,15 @@ const uploadFile = async () => {
             callNumber: fileData.callnumber || "",
             title: fileData.title || "Unknown Title",
             author: fileData.author || "Unknown Author",
-            copyright: fileData.copyright === "true", // Assuming it's a boolean field
+            copyright: fileData.copyright == "",
             accountNumber: fileData.accountnumber || "",
             additionalTitle: fileData.title_1 || "",
             volume: fileData.volume || "",
             additionalSubject: fileData.subject_1 || "",
             publisher: fileData.publisher || "",
             dealer: fileData.dealer || "",
-            price: parseFloat(fileData.price) || 0, // Assuming it's a numeric field
-            totalPrice: parseFloat(fileData.totalprice) || 0,
+            price: parsePrice(fileData.price), // Clean and parse the price field
+            totalPrice: parsePrice(fileData.totalprice), // Clean and parse the totalPrice field
             physDesc: fileData.physdesc || "",
             bibliography: fileData["Bibliography/Notes"] || "",
             isbn: fileData.isbn || "",
@@ -125,14 +134,10 @@ const uploadFile = async () => {
         batch.set(newDocRef, cleanedData);
     });
 
-    try {
-        await batch.commit();
-        emit('formSuccess');
-    } catch (error) {
-        console.error('Error committing batch:', error);
-    }
-
-    
+    // Commit the batch
+    await batch.commit();
+    emit('formSuccess');
     dialogLoading.value = false;
 };
+
 </script>
