@@ -32,7 +32,7 @@ onMounted(() => {
 </script>
 <template>
     <h1 class="text-2xl font-bold mb-4">Student Logs</h1>
-    <DataTable :value="products" tableStyle="min-width: 50rem"  paginator :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]" v-model:filters="filters"
+    <DataTable :value="products" tableStyle="min-width: 50rem" v-model:filters="filters"
         :globalFilterFields="['name', 'quantity', 'code', 'category']" ref="dt" removableSort  stripedRows
         scrollable scrollHeight="500px">
         <template #header>
@@ -51,9 +51,11 @@ onMounted(() => {
             </div>
         </template>
         <template #empty> No customers found. </template>
-        <Column field="code" header="Code"></Column>
+        <Column field="code" header="Library ID"></Column>
         <Column field="name" sortable header="Name"></Column>
-        <Column field="category" header="Category"></Column>
-        <Column field="quantity" header="Quantity"></Column>
+        <Column field="category" header="Course/Year"></Column>
+        <Column field="quantity" header="Time In"></Column>
+        <Column header="Time Out"></Column>
+        <Column header="Date"></Column>
     </DataTable>
 </template>

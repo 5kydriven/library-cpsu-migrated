@@ -52,10 +52,13 @@ onMounted(() => {
             </div>
         </template>
         <template #empty> No customers found. </template>
-        <Column field="code" header="Code"></Column>
+        <Column header="#" style="max-width: .5rem">
+            <template #body="slotProps">
+                {{ slotProps.index + 1 }}
+            </template>
+        </Column>
         <Column field="name" sortable header="Name"></Column>
-        <Column field="category" header="Category"></Column>
-        <Column field="quantity" header="Quantity"></Column>
+        <Column header="Actions"></Column>
     </DataTable>
 
     <Dialog v-model:visible="visible" modal header="Add Book Location" :style="{ width: '25rem' }">
