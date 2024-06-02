@@ -30,6 +30,11 @@ const router = createRouter({
       component: () => import('../pages/userPortal/account/userAccountForm.vue'),
     },
     {
+      path: '/user-profile',
+      name: 'user-profile',
+      component: () => import('../pages/userPortal/userProfile.vue'),
+    },
+    {
       path: '/librarian',
       name: 'homepage',
       component: () => import('../pages/HomeView.vue'),
