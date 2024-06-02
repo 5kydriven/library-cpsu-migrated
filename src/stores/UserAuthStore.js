@@ -24,6 +24,7 @@ import {
             email: userDetails.email,
             uid,
           };
+          console.log(user)
         //   router.push( "/dashboard" );
         } else {
           // isLoading.value = false;

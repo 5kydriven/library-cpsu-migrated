@@ -26,7 +26,7 @@ const onSubmit = async (isNew) => {
             if (res.error) loginErr.value = res.message
             // loading.value = false;
         } else{
-            router.push("/test")
+            router.push("/user-account")
         }
     } else{
         const res = await store.loginUser(credentials);
@@ -34,6 +34,8 @@ const onSubmit = async (isNew) => {
         if (res) {
             if (res.error) loginErr.value = res.message
             // loading.value = false;
+        } else{
+            router.push("/user-account")
         }
 
     }
@@ -72,7 +74,7 @@ const onSubmit = async (isNew) => {
                             class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                             required v-model="credentials.password" />
                     </div>
-                    <Button @click="onSubmit(isLogin)" :label="isLogin? 'Sign In' : 'Sign Up'" class="w-full font-medium" />
+                    <Button @click="onSubmit(isLogin? false : true)" :label="isLogin? 'Sign In' : 'Sign Up'" class="w-full font-medium" />
                     <p class="text-sm font-light text-gray-500 dark:text-gray-400" v-if="isLogin">
                         Don’t have an account yet? <a @click.prevent="isLogin = !isLogin" class="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign up</a>
                     </p>

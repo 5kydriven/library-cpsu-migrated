@@ -16,15 +16,6 @@ const icondisplay = ref();
 const idNumberGenerated = ref(1)
 const id = ref()
 
-
-const getUser = () => {
-    if(store.user){
-        isLoading.value = false;
-    } else{
-        isLoading.value = true;
-    }
-}
-
 async function getStudents() {
     try{
         const querySnapshot = await getDocs(collection(db, "students"));
@@ -39,8 +30,9 @@ async function getStudents() {
 }
 
 onMounted( async () => {
-    store.init()
-    getUser()
+    const res = store.init()
+    console.log(store.user.email)
+
     getStudents()
 })
 
@@ -75,6 +67,7 @@ function onFileChange (e) {
 };
 
 async function onSubmit(){
+    isLoading.value = true
     try{
         if(file){
             await imageStore.upload('students_image/', file)
@@ -83,7 +76,7 @@ async function onSubmit(){
         }
         await setDoc(doc(db, "students", id.value), studentData.value);
         console.log("added successfully");
-        console.log(studentData)
+        isLoading.value = false
     } catch(error){
         console.error(error);
     }
