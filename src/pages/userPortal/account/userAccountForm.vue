@@ -1,13 +1,12 @@
 <script setup>
 import { onBeforeMount, onMounted, ref } from "vue";
-import { useAuthStore } from "@/stores/UserAuthStore";
+import { onAuthStateChanged } from "firebase/auth";
 import {useStorage} from "@/stores/imageUpload";
 import { collection, onSnapshot, setDoc, doc, getDocs } from "firebase/firestore"; 
-import { db } from "@/stores/firebase.js";
+import { db, auth } from "@/stores/firebase.js";
 import loader from "@/components/loader.vue";
 
 const isLoading = ref(false);
-const store = useAuthStore()
 const imageStore = useStorage()
 
 const buttondisplay = ref();
@@ -15,26 +14,6 @@ const icondisplay = ref();
 
 const idNumberGenerated = ref(1)
 const id = ref()
-
-async function getStudents() {
-    try{
-        const querySnapshot = await getDocs(collection(db, "students"));
-        querySnapshot.forEach((doc) => {
-            idNumberGenerated.value++
-        });
-        id.value = "CPSU-LRC-000" + idNumberGenerated.value.toString();
-    
-    } catch(error){
-        console.error("error fetching data",error);
-    }
-}
-
-onMounted( async () => {
-    const res = store.init()
-    console.log(store.user.email)
-
-    getStudents()
-})
 
 const studentData = ref({
     image: '',
@@ -44,9 +23,41 @@ const studentData = ref({
     course: "",
     year: "",
     address: "",
-    uid: store.user.uid,
-    email: store.user.email,
 })
+
+const uid = ref()
+const email = ref()
+onMounted(() => {
+    onAuthStateChanged(auth, (userDetails) => {
+        console.log(userDetails);
+        if (userDetails) {
+          uid.value = userDetails.uid;
+          email.value = userDetails.email
+          getStudents()
+        //   router.push( "/dashboard" );
+        } else {
+          // isLoading.value = false;
+          console.log("not signed in");
+        //   router.replace({ name: "signin" });         
+        }
+        // isLoading.value = true;
+      });
+
+})
+
+async function getStudents() {
+    try{
+        const querySnapshot = await getDocs(collection(db, "students"));
+        querySnapshot.forEach((doc) => {
+            idNumberGenerated.value++
+        });
+        id.value = "CPSU-LRC-000" + idNumberGenerated.value.toString();
+        studentData.value = {...studentData.value, ...{uid: uid.value ,email: email.value, student_id: id.value}}
+    } catch(error){
+        console.error("error fetching data",error);
+    }
+}
+
 
 const image = ref(null);
 let file;

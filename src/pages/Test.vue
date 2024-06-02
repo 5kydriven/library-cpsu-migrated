@@ -1,7 +1,15 @@
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
+import { onAuthStateChanged } from 'firebase/auth';
+import { query, collection, where, getDocs } from 'firebase/firestore';
+import { db, auth } from '@/stores/firebase';
+import { useAuthStore } from '@/stores/UserAuthStore';
 import qrCode from "@/components/studentComp/qrCode.vue"
 import { useToast } from "primevue/usetoast";
+import loader from '@/components/loader.vue';
+
+const isLoading = ref(false)
+const store = useAuthStore()
 const toast = useToast();
 
 const onAdvancedUpload = () => {
@@ -15,9 +23,46 @@ const OpToggle = (event) => {
     op.value.toggle(event);
 }
 
+const uid = ref()
+onMounted(() => {
+    isLoading.value = true
+    onAuthStateChanged(auth, (userDetails) => {
+        console.log(userDetails);
+        if (userDetails) {
+          uid.value = userDetails.uid;
+          getStudent()
+        //   router.push( "/dashboard" );
+        } else {
+          // isLoading.value = false;
+          console.log("not signed in");
+        //   router.replace({ name: "signin" });         
+        }
+        // isLoading.value = true;
+      });
+
+})
+
+const student = ref({})
+
+const getStudent = async ()=>{
+    const queryStudent = query(collection(db, 'students'), where('uid', '==', uid.value));
+    
+    try {
+        const querySnapshot = await getDocs(queryStudent);
+            querySnapshot.forEach((doc) => {
+              student.value = {...student.value, ...doc.data()}
+              console.log(doc.data());
+        });
+        isLoading.value = false
+    } catch (error) {
+        console.error('Error getting documents: ', error);
+    }
+}
+
 </script>
 <template>
-      <section class="bg-gray-50 dark:bg-gray-900">
+    <loader v-if="isLoading"/>
+      <section class="bg-gray-50 dark:bg-gray-900" v-else>
         <div class=" px-4 mx-auto max-w-2xl  bg-white">
             <div class="flex justify-between items-center p-5 ">
               <img src="/logo.png" width="50" alt="">
@@ -30,7 +75,7 @@ const OpToggle = (event) => {
                                 aria-expanded="false" data-dropdown-toggle="dropdown-user">
                                 <span class="sr-only">Open user menu</span>
                                 <img class="w-8 h-8 rounded-full"
-                                    src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+                                    :src="student.image"
                                     alt="user photo">
                             </button>
                         </div>
@@ -38,11 +83,11 @@ const OpToggle = (event) => {
                             <div class="text-base list-none bg-white">
                                 <div class="px-4 py-3" role="none">
                                     <p class="text-sm text-gray-900 dark:text-white" role="none">
-                                        Neil Sims
+                                        {{ student.name }}
                                     </p>
                                     <p class="text-sm font-medium text-gray-900 truncate dark:text-gray-300"
                                         role="none">
-                                        neil.sims@flowbite.com
+                                       {{ student.email }}
                                     </p>
                                 </div>
                                 <hr>
@@ -63,19 +108,19 @@ const OpToggle = (event) => {
               </div>
             </div>
             <div class=" flex flex-col items-center bg-[url('/background.jpg')]">
-                <img src="/logo.png" class="mt-10 border-4 border-green-600 rounded-full" width="100px" height="100px" alt="">
-                <span class="mb-4 text-xl font-bold text-gray-900 dark:text-white">John Doe</span>
-                <span class="text-gray-400">BSIT</span>
+                <img :src="student.image" class="mt-10 border-4 border-green-600 rounded-full" width="100px" height="100px" alt="">
+                <span class="mb-4 text-xl font-bold text-gray-900 dark:text-white">{{ student.name }}</span>
+                <span class="text-gray-400">{{ student.course }}</span>
             </div>
             <div>
                 <div>
                     <span class="ont-bold text-gray-900">Email</span>
                     <div class="">
-                        <span>sample@gmail.com</span>
+                        <span>{{ student.email }}</span>
                     </div>
                 </div>
                 <div class="w-full flex justify-center">
-                  <qrCode/>
+                  <qrCode :id="student.student_id"/>
                 </div>
             </div>
         </div>
