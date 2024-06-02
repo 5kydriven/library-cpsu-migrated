@@ -1,7 +1,7 @@
 <script setup>
 import {onMounted, ref} from 'vue'
 import { Html5Qrcode } from 'html5-qrcode';
-import { doc, collection, getDocs, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, collection, getDocs, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/stores/firebase';
 import { useToast } from "primevue/usetoast";
 import loader from "@/components/loader.vue"
@@ -18,7 +18,7 @@ const Html5Qrcodes = ref()
 
 const students = ref([])
 
-onMounted(async () => {
+const getStudents = async () => {
     isLoading.value = true
     try{
         const querySnapshot = await getDocs(collection(db, "students"));
@@ -30,7 +30,7 @@ onMounted(async () => {
 
     }
 
-})
+}
 const createScanQRCodes = () => {
     Html5Qrcodes.value = new Html5Qrcode("qr-code-full-region")
     const config = {fps:10, qrbox: {width: 230, height: 230 }};
@@ -55,25 +55,32 @@ async function onScanSuccess(decodeResult){
                     student.value = docData
                     isStudent.value = true
                     try{
-                         if(docData.status == 'OUT'){
-                             isIN.value = true
-                             message.value = "WELCOME!!!";
-                             student.value = {...docData, ...{status: 'IN'}}
-                             const docRef = doc(db, 'students', scannedQrCodes.value)
-                             await updateDoc(docRef, student.value)
-                         } else{
-                             isIN.value = false
-                             message.value = "GOODBYE!!!";
-                             student.value = {...docData, ...{status: 'OUT'}}
-                             const docRef = doc(db, 'students', scannedQrCodes.value)
-                             await updateDoc(docRef, student.value)
+                         if(docData.status == 'IN'){
+                            isIN.value = false
+                            message.value = "GOODBYE!!!";
+                            student.value = {...docData, ...{status: 'OUT'}} //set status
+                            const docRef = doc(db, 'students', scannedQrCodes.value)
+                            await updateDoc(docRef, student.value)
+                            
+                            //time in
+                            await setDoc(doc(db, "students", id.value), studentData.value);
+                            console.log("added successfully");
+                        } else{
+                            isIN.value = true
+                            message.value = "WELCOME!!!";
+                            student.value = {...docData, ...{status: 'IN'}} //set status
+                            const docRef = doc(db, 'students', scannedQrCodes.value)
+                            await updateDoc(docRef, student.value)
+                              //time in
+                            await setDoc(doc(db, "students", id.value), studentData.value);
+                            console.log("added successfully");
+                             
                          }
-                         setInterval(()=>{
-                              student.value = {}
-                              message.value = "";
-                              isStudent.value = false
-                         }, 6000)
                          lastScanned.value = scannedQrCodes.value
+                         getStudents()
+                         setInterval(() => {
+                            isStudent.value = false
+                         }, 5000)
                     } catch(error){
                          console.error(error);
                     }
@@ -93,8 +100,10 @@ async function onScanSuccess(decodeResult){
 
 
 onMounted(()=>{
+    getStudents()
     scannedQrCodes.value = ''
     createScanQRCodes()
+
 })
 
 
