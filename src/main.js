@@ -38,6 +38,7 @@ import Skeleton from 'primevue/skeleton';
 import Carousel from 'primevue/carousel';
 import FileUpload from 'primevue/fileupload';
 
+
 const app = createApp(App)
 
 app.component('InputMask', InputMask)

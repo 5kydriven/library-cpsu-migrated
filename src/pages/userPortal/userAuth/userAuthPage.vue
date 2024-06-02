@@ -1,7 +1,9 @@
 <script setup>
 import { useAuthStore } from "@/stores/UserAuthStore";
 import { reactive, ref } from "vue";
+import { useRouter } from "vue-router";
 
+const router = useRouter()
 const store = useAuthStore()
 const isLogin = ref(true)
 
@@ -14,19 +16,21 @@ const loading = ref(false);
 const loginErr = ref(null);
 
 
-const onSubmit = async () => {
+const onSubmit = async (isNew) => {
 
     // loading.value = true;
-    if(!isLogin){
+    if(isNew){
         const res = await store.createUser(credentials);
             
         if (res) {
             if (res.error) loginErr.value = res.message
             // loading.value = false;
+        } else{
+            router.push("/test")
         }
     } else{
         const res = await store.loginUser(credentials);
-            
+        
         if (res) {
             if (res.error) loginErr.value = res.message
             // loading.value = false;
@@ -49,7 +53,7 @@ const onSubmit = async () => {
                     {{ isLogin? 'Sign in to your account' : 'Create an account' }}
                 </h1>
 
-                <form class="space-y-4 md:space-y-6" @submit.prevent="onSubmit">
+                <form class="space-y-4 md:space-y-6">
                     <div class="flex items-center justify-center font-semibold p-2 mb-2 text-sm text-red-700 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800"
                         role="alert" v-if="loginErr">
                         <div>{{ loginErr }}</div>
@@ -68,7 +72,7 @@ const onSubmit = async () => {
                             class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                             required v-model="credentials.password" />
                     </div>
-                    <Button @click="onSubmit" :label="isLogin? 'Sign In' : 'Sign Up'" class="w-full font-medium" />
+                    <Button @click="onSubmit(isLogin)" :label="isLogin? 'Sign In' : 'Sign Up'" class="w-full font-medium" />
                     <p class="text-sm font-light text-gray-500 dark:text-gray-400" v-if="isLogin">
                         Don’t have an account yet? <a @click.prevent="isLogin = !isLogin" class="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign up</a>
                     </p>
