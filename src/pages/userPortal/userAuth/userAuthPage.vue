@@ -30,12 +30,12 @@ const onSubmit = async (isNew) => {
         }
     } else{
         const res = await store.loginUser(credentials);
-        
-        if (res) {
-            if (res.error) loginErr.value = res.message
-            // loading.value = false;
-        } else{
+        if (res.error) {
+            loginErr.value = res.message
+        } else if (res.role === 'user'){
             router.push("/user-account")
+        } else {
+            router.push("/librarian")
         }
 
     }
