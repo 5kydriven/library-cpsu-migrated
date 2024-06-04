@@ -18,13 +18,12 @@ const loginErr = ref(null);
 
 const onSubmit = async (isNew) => {
 
-    // loading.value = true;
+    loading.value = true;
     if (isNew) {
         const res = await store.createUser(credentials);
 
         if (res) {
             if (res.error) loginErr.value = res.message
-            // loading.value = false;
         } else {
             router.push("/user-account")
         }
@@ -37,8 +36,8 @@ const onSubmit = async (isNew) => {
         } else {
             router.push("/librarian")
         }
-
     }
+    loading.value = false;
 };
 </script>
 
@@ -46,7 +45,7 @@ const onSubmit = async (isNew) => {
     <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto h-screen lg:py-0 ">
         <div
             class="w-full bg-white rounded-lg border shadow-md dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-            <a href="#" class="w-full flex justify-center my-4 text-2xl font-semibold text-gray-900 dark:text-white">
+            <a href="#" class="w-full flex justify-center mt-4 text-2xl font-semibold text-gray-900 dark:text-white">
                 <img class="h-20 rounded-full shadow-md mr-2" src="/logo.png" alt="logo" />
             </a>
             <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
@@ -75,7 +74,7 @@ const onSubmit = async (isNew) => {
                             required v-model="credentials.password" />
                     </div>
                     <Button @click="onSubmit(isLogin ? false : true)" :label="isLogin ? 'Sign In' : 'Sign Up'"
-                        class="w-full font-medium" />
+                        class="w-full font-medium" :loading="loading"/>
                     <p class="text-sm font-light text-gray-500 dark:text-gray-400" v-if="isLogin">
                         Don’t have an account yet? <a @click.prevent="isLogin = !isLogin"
                             class="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign up</a>
