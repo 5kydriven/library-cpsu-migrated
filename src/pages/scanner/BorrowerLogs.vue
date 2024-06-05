@@ -1,5 +1,5 @@
 <script setup>
-import {onMounted, ref} from 'vue'
+import {computed, onMounted, ref, watch} from 'vue'
 import { Html5Qrcode } from 'html5-qrcode';
 import { doc, collection, getDocs, getDoc} from 'firebase/firestore';
 import { db } from '@/stores/firebase';
@@ -39,20 +39,26 @@ const errmsg = ref("")
 const student = ref({})
 const isStudent = ref(false)
 
-async function onScanSuccess(decodeResult){
+function onScanSuccess(decodeResult){
+    
         scannedQrCodes.value = decodeResult
-        students.value.forEach(async (docData)=>{
-            if(docData.id == scannedQrCodes.value){
-                student.value = docData
-                isStudent.value = true
-            }
-            else{
-                // errmsg.value = "no match found";
-                setInterval(()=>{
-                    errmsg.value = ''
-                }, 3000)
-            }
-        })
+        const result = students.value.filter(doc => doc.id == scannedQrCodes.value);
+
+        if (result.length === 1) {
+            student.value = result[0];
+            isStudent.value = true;
+    
+        } else if (result.length === 0) {
+            errmsg.value = "no match found";
+            isStudent.value = false;
+            student.value = null;
+    
+            setTimeout(() => {
+                errmsg.value = '';
+            }, 3000);
+        } else {
+            console.log(scannedQrCodes);
+        }
     }
 
 
@@ -95,6 +101,9 @@ onMounted(async ()=>{
                                     <a href class="inline-flex items-center px-4 py-2 text-sm font-medium text-center  bg-green-200 rounded-sm border border-green-600">Return</a>
                                 </div>
                             </div>
+                        </div>
+                        <div v-else-if="errmsg">
+                            <span class="text-2xl text-red-600">{{ errmsg }}</span>
                         </div>
                         <div class="flex justify-center items-center h-80" v-else>
                             <div class="w-32 aspect-square rounded-full relative flex justify-center items-center animate-[spin_3s_linear_infinite] z-40 bg-[conic-gradient(white_0deg,white_300deg,transparent_270deg,transparent_360deg)] before:animate-[spin_2s_linear_infinite] before:absolute before:w-[60%] before:aspect-square before:rounded-full before:z-[80] before:bg-[conic-gradient(white_0deg,white_270deg,transparent_180deg,transparent_360deg)] after:absolute after:w-3/4 after:aspect-square after:rounded-full after:z-[60] after:animate-[spin_3s_linear_infinite] after:bg-[conic-gradient(#065f46_0deg,#065f46_180deg,transparent_180deg,transparent_360deg)]">

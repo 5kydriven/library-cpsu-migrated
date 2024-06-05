@@ -16,7 +16,7 @@ const show = (sev, sum, msg) => {
 const scannedQrCodes = ref()
 const Html5Qrcodes = ref()
 
-const students = ref([])
+const students = ref([]) // handle students data
 
 const getStudents = async () => {
     isLoading.value = true
@@ -50,32 +50,34 @@ const isIN = ref( false)
 async function onScanSuccess(decodeResult){
         scannedQrCodes.value = decodeResult
         if(lastScanned.value != decodeResult){
-            students.value.forEach(async (docData)=>{
-                if(docData.id == scannedQrCodes.value){
-                    student.value = docData
-                    isStudent.value = true
-                    try{
-                         if(docData.status == 'IN'){
+            const result = students.value.filter(doc => doc.id == scannedQrCodes.value);
+    
+            if (result.length === 1) {
+                student.value = result[0];
+                isStudent.value = true;
+                try{
+                         if(student.value.status == 'IN'){
                             isIN.value = false
                             message.value = "GOODBYE!!!";
-                            student.value = {...docData, ...{status: 'OUT'}} //set status
+                            student.value = {...student.value, ...{status: 'OUT'}} //set status
                             const docRef = doc(db, 'students', scannedQrCodes.value)
                             await updateDoc(docRef, student.value)
                             
                             //time in
-                            await setDoc(doc(db, "students", id.value), studentData.value);
+                            // await setDoc(doc(db, "students", id.value), studentData.value);
                             console.log("added successfully");
                         } else{
                             isIN.value = true
                             message.value = "WELCOME!!!";
-                            student.value = {...docData, ...{status: 'IN'}} //set status
+                            student.value = {...student.value, ...{status: 'IN'}} //set status
                             const docRef = doc(db, 'students', scannedQrCodes.value)
                             await updateDoc(docRef, student.value)
                               //time in
-                            await setDoc(doc(db, "students", id.value), studentData.value);
+                            // await setDoc(doc(db, "students", id.value), studentData.value);
                             console.log("added successfully");
                              
                          }
+                         
                          lastScanned.value = scannedQrCodes.value
                          getStudents()
                          setInterval(() => {
@@ -84,14 +86,20 @@ async function onScanSuccess(decodeResult){
                     } catch(error){
                          console.error(error);
                     }
-                }
-                else{
-                    // errmsg.value = "no match found";
-                    setInterval(()=>{
-                        errmsg.value = ''
-                    }, 3000)
-                }
-            })
+
+            } else if (result.length === 0) {
+                errmsg.value = "no match found";
+                isStudent.value = false;
+                student.value = null;
+        
+                setTimeout(() => {
+                    errmsg.value = '';
+                }, 3000);
+                lastScanned.value = scannedQrCodes.value
+            } else {
+                console.log(scannedQrCodes);
+                lastScanned.value = scannedQrCodes.value
+            }
 
         } else{
             show('error', 'error', 'Already scanned')
