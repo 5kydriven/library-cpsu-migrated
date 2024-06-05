@@ -5,6 +5,7 @@ import ImportBooks from '@/components/booksComp/ImportBooks.vue';
 import { useToast } from 'primevue/usetoast';
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from '@/stores/firebase.js'
+import BookDetails from '@/components/booksComp/bookDetails.vue'
 
 const toast = useToast();
 
@@ -15,6 +16,7 @@ const dialogPosition = ref('center');
 const dialogVisible = ref(false);
 const op = ref();
 const loading = ref(false)
+const viewBook = ref(false)
 
 const initFilters = () => {
     filters.value = {
@@ -129,7 +131,7 @@ onMounted(() => {
                             <li>
                                 <a href="#"
                                     class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                                    @click="showProfile">Show</a>
+                                    @click="viewBook = true">Show</a>
                             </li>
                             <li>
                                 <a href="#"
@@ -145,6 +147,10 @@ onMounted(() => {
     <Dialog v-model:visible="dialogVisible" :style="{ width: '40rem' }" :position="dialogPosition" :draggable="false"
         modal header="Import File">
         <ImportBooks @formSuccess="onFormSuccess" />
+    </Dialog>
+
+    <Dialog v-model:visible="viewBook" draggable="false" modal header="Book Information">
+        <BookDetails />
     </Dialog>
 
     <Toast />

@@ -79,7 +79,6 @@ export const useAuthStore = defineStore("authStore", () => {
       // Sign in the user with email and password
       const userCredential = await signInWithEmailAndPassword(auth, credentials.email, credentials.password);
       const user = userCredential.user;
-
       // Get the user's role from Firestore
       const docSnap = await getDoc(doc(db, "accountRoles", user.uid));
 

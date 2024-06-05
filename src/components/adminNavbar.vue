@@ -1,10 +1,13 @@
 <script setup>
 import { ref } from 'vue';
 import { useAuthStore } from '@/stores/UserAuthStore';
+import { auth } from '@/stores/firebase';
 
 const store = useAuthStore();
 
 const op = ref();
+
+console.log(auth.currentUser)
 
 const OpToggle = (event) => {
     op.value.toggle(event);
@@ -43,15 +46,15 @@ const OpToggle = (event) => {
                                     </p>
                                     <p class="text-sm font-medium text-gray-900 truncate dark:text-gray-300"
                                         role="none">
-                                        neil.sims@flowbite.com
+                                        {{auth.currentUser.email}}
                                     </p>
                                 </div>
                                 <hr>
                                 <ul class="py-1" role="none">
-                                    <li>
+                                    <!-- <li>
                                         <a href="#"
                                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white">Settings</a>
-                                    </li>
+                                    </li> -->
                                     <li>
                                         <a @click="store.logoutUser"
                                             class="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white">Sign

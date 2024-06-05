@@ -11,9 +11,6 @@ const initFilters = () => {
     filters.value = {
         global: { value: null, },
         name: { value: null },
-        category: { value: null },
-        quantity: { value: null },
-        code: { value: null },
     };
 };
 
