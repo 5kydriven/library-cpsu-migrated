@@ -84,7 +84,7 @@ export const useAuthStore = defineStore("authStore", () => {
       const docSnap = await getDoc(doc(db, "accountRoles", user.uid));
 
       const role = docSnap.data().role;
-
+      // console.log(role)
       // Return the role
       return { role: role };
     } catch (err) {
