@@ -89,7 +89,7 @@ const books = ref([
                         <span class="material-icons-outlined">
                             list_alt
                         </span>
-                        <span class="flex-1 ms-3 whitespace-nowrap">Student log's</span>
+                        <span class="flex-1 ms-3 whitespace-nowrap">Log's</span>
                     </RouterLink>
                 </li>
                 <li>

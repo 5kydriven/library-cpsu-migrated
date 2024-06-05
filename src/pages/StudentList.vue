@@ -1,20 +1,18 @@
 <script setup>
-import { db } from '@/stores/firebase.js';
 import { ref, onMounted } from 'vue';
-import { ProductService } from '../service/productService.js';
+import { useAdminStore } from '@/stores/adminStore';
 
-
-const products = ref();
+const adminStore = useAdminStore();
 const filters = ref();
 const dt = ref();
 
 const initFilters = () => {
     filters.value = {
-        global: { value: null,},
-        name: {value: null},
-        category: {value: null},
-        quantity: {value: null},
-        code: { value: null},
+        global: { value: null, },
+        name: { value: null },
+        course: { value: null },
+        year: { value: null },
+        email: { value: null },
     };
 };
 
@@ -29,30 +27,15 @@ const exportCSV = () => {
 };
 
 onMounted(() => {
-    ProductService.getProducts().then((data) => (products.value = data));
+    adminStore.fetchStudents();
 });
 
-const getSeverity = (product) => {
-    switch (product.inventoryStatus) {
-        case 'INSTOCK':
-            return 'success';
-
-        case 'LOWSTOCK':
-            return 'warning';
-
-        case 'OUTOFSTOCK':
-            return 'danger';
-
-        default:
-            return null;
-    }
-};
 </script>
 <template>
     <h1 class="text-2xl font-bold mb-4">Students List</h1>
-    <DataTable :value="products" tableStyle="min-width: 50rem"
-        v-model:filters="filters" :globalFilterFields="['name', 'quantity', 'code', 'category']" ref="dt" removableSort
-        stripedRows scrollable scrollHeight="500px">
+    <DataTable :value="adminStore.students" v-model:filters="filters" tableStyle="min-width: 50rem"
+        :globalFilterFields="['name']" ref="dt" removableSort stripedRows scrollable scrollHeight="500px"
+        :loading="adminStore.loading" dataKey="id" :virtualScrollerOptions="{ itemSize: 46 }">
         <template #header>
             <div class="flex justify-between">
                 <div class="flex gap-2">
@@ -68,25 +51,19 @@ const getSeverity = (product) => {
                 </span>
             </div>
         </template>
-        <template #empty> No customers found. </template>
-        <Column field="code" header="Library ID"></Column>
-        <Column header="Name" sortable sortField="name" class="flex items-center gap-3">
-            <template #body="slotProps">
-                <img :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.data.image}`"
-                    :alt="slotProps.data.image" class="w-[2.5rem] h-[2.5rem] shadow-md rounded-full" />
+        <template #empty> No student's found. </template>
+        <Column field="id" header="Library ID"></Column>
+        <Column header="Name" field="name" sortable class="flex items-center gap-3">
+            <template #body="{ data }">
+                <img :src="data.image" class="w-[2.5rem] h-[2.5rem] shadow-md rounded-full" />
                 <div class="flex flex-col">
-                    <span>{{ slotProps.data.name }}</span>
+                    <span>{{ data.name }}</span>
                 </div>
             </template>
         </Column>
 
-        <Column field="name" sortable header="Course"></Column>
-        <Column field="category" header="Year Level"></Column>
-        <Column field="quantity" header="Gender"></Column>
-        <Column header="Status">
-            <template #body="slotProps">
-                <Tag :value="slotProps.data.inventoryStatus" :severity="getSeverity(slotProps.data)" />
-            </template>
-        </Column>
+        <Column field="course" header="Course"></Column>
+        <Column field="year" header="Year Level"></Column>
+        <Column field="email" header="Email"></Column>
     </DataTable>
 </template>
