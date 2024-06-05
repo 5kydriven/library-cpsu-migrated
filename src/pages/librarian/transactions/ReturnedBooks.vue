@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { ProductService } from '../../service/productService.js';
+import { ProductService } from '@/service/productService.js';
 
 const products = ref();
 const filters = ref();
@@ -31,7 +31,7 @@ onMounted(() => {
 });
 </script>
 <template>
-    <h1 class="text-2xl font-bold mb-4">Borrowed Books</h1>
+    <h1 class="text-2xl font-bold mb-4">Returned Books</h1>
     <DataTable :value="products" tableStyle="min-width: 50rem" v-model:filters="filters"
         :globalFilterFields="['name', 'quantity', 'code', 'category']" ref="dt" removableSort showGridlines stripedRows
         scrollable scrollHeight="500px">

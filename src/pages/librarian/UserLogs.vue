@@ -5,7 +5,6 @@ import { ProductService } from '../../service/productService.js';
 const products = ref();
 const filters = ref();
 const dt = ref();
-const visible = ref(false);
 
 const initFilters = () => {
     filters.value = {
@@ -32,15 +31,15 @@ onMounted(() => {
 });
 </script>
 <template>
-    <h1 class="text-2xl font-bold mb-4">Books Location</h1>
+    <h1 class="text-2xl font-bold mb-4">Student Logs</h1>
     <DataTable :value="products" tableStyle="min-width: 50rem" v-model:filters="filters"
-        :globalFilterFields="['name', 'quantity', 'code', 'category']" ref="dt" removableSort showGridlines stripedRows
+        :globalFilterFields="['name', 'quantity', 'code', 'category']" ref="dt" removableSort  stripedRows
         scrollable scrollHeight="500px">
         <template #header>
             <div class="flex justify-between">
                 <div class="flex gap-2">
                     <Button type="button" icon="pi pi-filter-slash" label="Clear" outlined @click="clearFilter()" />
-                    <Button icon="pi pi-plus" label="Add" @click="visible = true" />
+                    <Button icon="pi pi-external-link" label="Export" @click="exportCSV($event)" />
                 </div>
 
 
@@ -52,22 +51,11 @@ onMounted(() => {
             </div>
         </template>
         <template #empty> No customers found. </template>
-        <Column header="#" style="max-width: .5rem">
-            <template #body="slotProps">
-                {{ slotProps.index + 1 }}
-            </template>
-        </Column>
+        <Column field="code" header="Library ID"></Column>
         <Column field="name" sortable header="Name"></Column>
-        <Column header="Actions"></Column>
+        <Column field="category" header="Course/Year"></Column>
+        <Column field="quantity" header="Time In"></Column>
+        <Column header="Time Out"></Column>
+        <Column header="Date"></Column>
     </DataTable>
-
-    <Dialog v-model:visible="visible" modal header="Add Book Location" :style="{ width: '25rem' }">
-        <span class="text-surface-600 dark:text-surface-0/70 block mb-5">Add category or book location.</span>
-        <div class="flex items-center gap-3 mb-3">
-            <InputText id="username" class="flex-auto" autocomplete="off" />
-        </div>
-        <div class="flex justify-end gap-2">
-            <Button type="button" label="Add" @click="visible = false"></Button>
-        </div>
-    </Dialog>
 </template>

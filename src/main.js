@@ -37,7 +37,7 @@ import SplitterPanel from 'primevue/splitterpanel';
 import Skeleton from 'primevue/skeleton';
 import Carousel from 'primevue/carousel';
 import FileUpload from 'primevue/fileupload';
-
+import Chart from 'primevue/chart';
 
 const app = createApp(App)
 
@@ -66,6 +66,7 @@ app.component('SplitterPanel', SplitterPanel)
 app.component('Skeleton', Skeleton)
 app.component('Carousel', Carousel)
 app.component('FileUpload', FileUpload)
+app.component('Chart', Chart)
 
 app.use(PrimeVue, {
     unstyled: true,

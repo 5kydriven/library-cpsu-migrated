@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { ProductService } from '../service/productService.js';
+import { ProductService } from '@/service/productService.js';
 
 const products = ref();
 const filters = ref();
@@ -31,9 +31,9 @@ onMounted(() => {
 });
 </script>
 <template>
-    <h1 class="text-2xl font-bold mb-4">Student Logs</h1>
+    <h1 class="text-2xl font-bold mb-4">Borrowed Books</h1>
     <DataTable :value="products" tableStyle="min-width: 50rem" v-model:filters="filters"
-        :globalFilterFields="['name', 'quantity', 'code', 'category']" ref="dt" removableSort  stripedRows
+        :globalFilterFields="['name', 'quantity', 'code', 'category']" ref="dt" removableSort showGridlines stripedRows
         scrollable scrollHeight="500px">
         <template #header>
             <div class="flex justify-between">
@@ -51,11 +51,9 @@ onMounted(() => {
             </div>
         </template>
         <template #empty> No customers found. </template>
-        <Column field="code" header="Library ID"></Column>
+        <Column field="code" header="Code"></Column>
         <Column field="name" sortable header="Name"></Column>
-        <Column field="category" header="Course/Year"></Column>
-        <Column field="quantity" header="Time In"></Column>
-        <Column header="Time Out"></Column>
-        <Column header="Date"></Column>
+        <Column field="category" header="Category"></Column>
+        <Column field="quantity" header="Quantity"></Column>
     </DataTable>
 </template>

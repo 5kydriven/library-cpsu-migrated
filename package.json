@@ -10,6 +10,7 @@
     "test:unit": "vitest"
   },
   "dependencies": {
+    "chart.js": "^4.4.3",
     "firebase": "^10.12.2",
     "html5-qrcode": "^2.3.8",
     "icons": "^1.0.0",
