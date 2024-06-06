@@ -1,7 +1,7 @@
 <script setup>
 import {computed, onMounted, ref, watch} from 'vue'
 import { Html5Qrcode } from 'html5-qrcode';
-import { doc, collection, getDocs, getDoc} from 'firebase/firestore';
+import { doc, getDoc} from 'firebase/firestore';
 import { db } from '@/stores/firebase';
 import loader from "@/components/loader.vue"
 
@@ -11,21 +11,21 @@ const isLoading = ref(false)
 const scannedQrCodes = ref()
 const Html5Qrcodes = ref()
 
-const students = ref([])
+// const students = ref([])
 
-const getStudents = async () => {
-    isLoading.value = true
-    try{
-        const querySnapshot = await getDocs(collection(db, "students"));
-        querySnapshot.forEach((doc) => {
-            students.value.push({...doc.data(), ...{id: doc.id}})
-        });
-        isLoading.value = false
-    } catch(error){
+// const getStudents = async () => {
+//     isLoading.value = true
+//     try{
+//         const querySnapshot = await getDocs(collection(db, "students"));
+//         querySnapshot.forEach((doc) => {
+//             students.value.push({...doc.data(), ...{id: doc.id}})
+//         });
+//         isLoading.value = false
+//     } catch(error){
 
-    }
+//     }
 
-}
+// }
 const createScanQRCodes = () => {
     Html5Qrcodes.value = new Html5Qrcode("qr-code-full-region")
     const config = {fps:10, qrbox: {width: 230, height: 230 }};
@@ -39,31 +39,44 @@ const errmsg = ref("")
 const student = ref({})
 const isStudent = ref(false)
 
-function onScanSuccess(decodeResult){
-    
+async function onScanSuccess(decodeResult){
+        isLoading.value = true 
         scannedQrCodes.value = decodeResult
-        const result = students.value.filter(doc => doc.id == scannedQrCodes.value);
+        // const result = students.value.filter(doc => doc.id == scannedQrCodes.value);
+        try{
 
-        if (result.length === 1) {
-            student.value = result[0];
-            isStudent.value = true;
-    
-        } else if (result.length === 0) {
-            errmsg.value = "no match found";
+            const docRef = doc(db, "students", scannedQrCodes.value);
+            const docSnap = await getDoc(docRef);
+            isLoading.value = false
+            if (docSnap.exists()) {
+                student.value = docSnap.data();
+                isStudent.value = true;
+        
+            } else{
+                errmsg.value = "no match found";
+                isStudent.value = false;
+                student.value = null;
+        
+                setTimeout(() => {
+                    errmsg.value = '';
+                }, 3000);
+            }
+        } catch(error){
+            console.log(error);
+            isLoading.value = false
+            errmsg.value = "error try again";
             isStudent.value = false;
             student.value = null;
     
             setTimeout(() => {
                 errmsg.value = '';
             }, 3000);
-        } else {
-            console.log(scannedQrCodes);
         }
     }
 
 
 onMounted(async ()=>{
-    await getStudents()
+    // await getStudents()
     scannedQrCodes.value = ''
     createScanQRCodes()
 
@@ -90,7 +103,8 @@ onMounted(async ()=>{
                         <h1 class="text-3xl font-semibold text-white">CPSU LIBRARY SYSTEM</h1>
                     </div>
                     <div class="flex justify-center items-center h-96">
-                        <div class="w-full max-w-sm py-10 m-10 bg-white border-gray-200 border-2 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700  bg-gradient-to-t from-white to-green-500 " v-if="isStudent">
+                        <div class="loader" v-if="isLoading"></div>
+                        <div class="w-full max-w-sm py-10 m-10 bg-white border-gray-200 border-2 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700  bg-gradient-to-t from-white to-green-500 " v-else-if="isStudent">
                             
                             <div class="flex flex-col items-center pb-10">
                                 <img class="w-24 h-24 mb-3 rounded-full shadow-lg" :src="student.image" alt="Bonnie image"/>
@@ -106,13 +120,30 @@ onMounted(async ()=>{
                             <span class="text-2xl text-red-600">{{ errmsg }}</span>
                         </div>
                         <div class="flex justify-center items-center h-80" v-else>
-                            <div class="w-32 aspect-square rounded-full relative flex justify-center items-center animate-[spin_3s_linear_infinite] z-40 bg-[conic-gradient(white_0deg,white_300deg,transparent_270deg,transparent_360deg)] before:animate-[spin_2s_linear_infinite] before:absolute before:w-[60%] before:aspect-square before:rounded-full before:z-[80] before:bg-[conic-gradient(white_0deg,white_270deg,transparent_180deg,transparent_360deg)] after:absolute after:w-3/4 after:aspect-square after:rounded-full after:z-[60] after:animate-[spin_3s_linear_infinite] after:bg-[conic-gradient(#065f46_0deg,#065f46_180deg,transparent_180deg,transparent_360deg)]">
+                            <!-- <div class="w-32 aspect-square rounded-full relative flex justify-center items-center animate-[spin_3s_linear_infinite] z-40 bg-[conic-gradient(white_0deg,white_300deg,transparent_270deg,transparent_360deg)] before:animate-[spin_2s_linear_infinite] before:absolute before:w-[60%] before:aspect-square before:rounded-full before:z-[80] before:bg-[conic-gradient(white_0deg,white_270deg,transparent_180deg,transparent_360deg)] after:absolute after:w-3/4 after:aspect-square after:rounded-full after:z-[60] after:animate-[spin_3s_linear_infinite] after:bg-[conic-gradient(#065f46_0deg,#065f46_180deg,transparent_180deg,transparent_360deg)]">
                                 <span class="absolute w-[85%] aspect-square rounded-full z-[60] animate-[spin_5s_linear_infinite] bg-[conic-gradient(#34d399_0deg,#34d399_180deg,transparent_180deg,transparent_360deg)]">
                                 </span>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 <!-- </div> -->
             </div>
     </div>
 </template>
+<style scoped>
+/* HTML: <div class="loader"></div> */
+.loader {
+  width: 50px;
+  --b: 8px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #23b665;
+  -webkit-mask:
+    repeating-conic-gradient(#0000 0deg,#000 1deg 70deg,#0000 71deg 90deg),
+    radial-gradient(farthest-side,#0000 calc(100% - var(--b) - 1px),#000 calc(100% - var(--b)));
+  -webkit-mask-composite: destination-in;
+          mask-composite: intersect;
+  animation: l5 1s infinite;
+}
+@keyframes l5 {to{transform: rotate(.5turn)}}
+</style>

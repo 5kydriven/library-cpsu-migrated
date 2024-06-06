@@ -5,7 +5,6 @@ import { Html5Qrcode } from 'html5-qrcode';
 import { doc, collection, getDocs, getDoc, updateDoc, setDoc, addDoc, query, where } from 'firebase/firestore';
 import { db } from '@/stores/firebase';
 import { useToast } from "primevue/usetoast";
-import loader from "@/components/loader.vue"
 
 const toast = useToast();
 const isLoading = ref(false)
