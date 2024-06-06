@@ -33,7 +33,7 @@ const onSubmit = async (isNew) => {
         if (res.error) {
             loginErr.value = res.message
         } else if (res.role === 'student') {
-            router.push("/user-account")
+            router.push("/user-profile")
         } else {
             router.push("/librarian")
         }

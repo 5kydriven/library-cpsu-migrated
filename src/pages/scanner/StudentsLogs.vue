@@ -43,94 +43,99 @@ const isStudent = ref(false)
 const isIN = ref( false)
 
 async function onScanSuccess(decodeResult){
-        scannedQrCodes.value = decodeResult
-        if(lastScanned.value != decodeResult){
+    scannedQrCodes.value = decodeResult
+    if(lastScanned.value != decodeResult){
+            lastScanned.value = scannedQrCodes.value
             isLoading.value = true
 
-            const docRef = doc(db, "students", scannedQrCodes.value);
-            const docSnap = await getDoc(docRef);
-            
-            if (docSnap.exists()) {
-                isLoading.value = false
-                student.value = docSnap.data();
-                isStudent.value = true;
-                try{
-                         if(student.value.status == 'IN'){
-                            isIN.value = false
-                            message.value = "GOODBYE!!!";
-                            student.value = {...student.value, ...{status: 'OUT'}} //set status
-                            const docRef = doc(db, 'students', scannedQrCodes.value)
-                            await updateDoc(docRef, student.value)
-
-                            
-                            //time out
-                            const queryRecord = query(
-                                collection(db, 'studentLogs'),
-                                where('studentId', '==', 'CPSU-LRC-0003'),
-                                where('status', '==', 'IN'),
-                                where('date', '==', currentDate.value),
-                            );
-                            const logsSnapshot = await getDocs(queryRecord);
-
-                            logsSnapshot.forEach(async log => {
-                              
-                                const updatedRecord = {
-                                    ...log.data(),
-                                    time_out: time.value,
-                                    status: 'OUT',
-                                };
-
-                                try{
-                                    await updateDoc(doc(db, 'studentLogs', log.id), updatedRecord);
-                                    console.log("goodbye");
-                                } catch(error){
-                                    console.error(error);
-                                }
+            try{
+                const docRef = doc(db, "students", scannedQrCodes.value);
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    isLoading.value = false
+                    student.value = docSnap.data();
+                    isStudent.value = true;
+                    try{
+                             if(student.value.status == 'IN'){
+                                isIN.value = false
+                                message.value = "GOODBYE!!!";
+                                student.value = {...student.value, ...{status: 'OUT'}} //set status
+                                const docRef = doc(db, 'students', scannedQrCodes.value)
+                                await updateDoc(docRef, student.value)
+    
                                 
-                            });
-                            
-                        } else{
-                            isLoading.value = false
-                            isIN.value = true
-                            message.value = "WELCOME!!!";
-                            student.value = {...student.value, ...{status: 'IN'}} //set status
-                            const docRef = doc(db, 'students', scannedQrCodes.value)
-                            await updateDoc(docRef, student.value)
-                            
-                            //logs record
-                            const record = ref({
-                                date: currentDate,
-                                studentId: student.value.id,
-                                time_in: time.value,
-                                time_out: '',
-                                status: 'IN',
-                            })
-                            
-                            //time in
-                            await addDoc(collection(db, "studentLogs"), record.value)
+                                //time out
+                                const queryRecord = query(
+                                    collection(db, 'studentLogs'),
+                                    where('studentId', '==', 'CPSU-LRC-0003'),
+                                    where('status', '==', 'IN'),
+                                    where('date', '==', currentDate.value),
+                                );
+                                const logsSnapshot = await getDocs(queryRecord);
+    
+                                logsSnapshot.forEach(async log => {
+                                  
+                                    const updatedRecord = {
+                                        ...log.data(),
+                                        time_out: time.value,
+                                        status: 'OUT',
+                                    };
+    
+                                    try{
+                                        await updateDoc(doc(db, 'studentLogs', log.id), updatedRecord);
+                                        console.log("goodbye");
+                                    } catch(error){
+                                        console.error(error);
+                                    }
+                                    
+                                });
+                                
+                            } else{
+                                isLoading.value = false
+                                isIN.value = true
+                                message.value = "WELCOME!!!";
+                                student.value = {...student.value, ...{status: 'IN'}} //set status
+                                const docRef = doc(db, 'students', scannedQrCodes.value)
+                                await updateDoc(docRef, student.value)
+                                
+                                //logs record
+                                const record = ref({
+                                    date: currentDate,
+                                    studentId: student.value.id,
+                                    time_in: time.value,
+                                    time_out: '',
+                                    status: 'IN',
+                                })
+                                
+                                //time in
+                                await addDoc(collection(db, "studentLogs"), record.value)
+                                 
+                             }
                              
-                         }
-                         
-                         lastScanned.value = scannedQrCodes.value
-                         scannedQrCodes.value = ''
-                        //  setInterval(() => {
-                        //     isStudent.value = false
-                        //  }, 5000)
-                    } catch(error){
-                         console.error(error);
-                    }
-
-            } else {
+                             scannedQrCodes.value = ''
+                            //  setInterval(() => {
+                            //     isStudent.value = false
+                            //  }, 5000)
+                        } catch(error){
+                             console.error(error);
+                        }
+    
+                } else {
+                    isLoading.value = false
+                    errmsg.value = "no match found";
+                    isStudent.value = false;
+                    student.value = null;
+            
+                    setTimeout(() => {
+                        errmsg.value = '';
+                    }, 3000);
+                    lastScanned.value = scannedQrCodes.value
+                } 
+            } catch(error){
                 isLoading.value = false
-                errmsg.value = "no match found";
-                isStudent.value = false;
-                student.value = null;
-        
-                setTimeout(() => {
-                    errmsg.value = '';
-                }, 3000);
-                lastScanned.value = scannedQrCodes.value
-            } 
+                show('error', 'error', 'Try again')
+            }
 
         } else{
             show('error', 'error', 'Already scanned')

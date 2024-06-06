@@ -8,6 +8,7 @@ const props = defineProps({
 <template>
     <div>
         <qrcode-vue :value="props.id" :size="150" level="H" />
+        {{ props.id }}
     </div>
   </template>
   
