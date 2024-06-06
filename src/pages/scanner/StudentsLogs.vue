@@ -1,5 +1,5 @@
 <script setup>
-import {onMounted, ref} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import { useTimeAndDate } from '@/stores/dateAndTimeStore';
 import { Html5Qrcode } from 'html5-qrcode';
 import { doc, collection, getDocs, getDoc, updateDoc, setDoc, addDoc, query, where } from 'firebase/firestore';
@@ -26,21 +26,6 @@ const show = (sev, sum, msg) => {
 const scannedQrCodes = ref()
 const Html5Qrcodes = ref()
 
-const students = ref([]) // handle students data
-
-const getStudents = async () => {
-    isLoading.value = true
-    try{
-        const querySnapshot = await getDocs(collection(db, "students"));
-        querySnapshot.forEach((doc) => {
-            students.value.push({...doc.data(), ...{id: doc.id}})
-        });
-        isLoading.value = false
-    } catch(error){
-
-    }
-
-}
 const createScanQRCodes = () => {
     Html5Qrcodes.value = new Html5Qrcode("qr-code-full-region")
     const config = {fps:10, qrbox: {width: 230, height: 230 }};
@@ -60,10 +45,14 @@ const isIN = ref( false)
 async function onScanSuccess(decodeResult){
         scannedQrCodes.value = decodeResult
         if(lastScanned.value != decodeResult){
-            const result = students.value.filter(doc => doc.id == scannedQrCodes.value);
-    
-            if (result.length === 1) {
-                student.value = result[0];
+            isLoading.value = true
+
+            const docRef = doc(db, "students", scannedQrCodes.value);
+            const docSnap = await getDoc(docRef);
+            
+            if (docSnap.exists()) {
+                isLoading.value = false
+                student.value = docSnap.data();
                 isStudent.value = true;
                 try{
                          if(student.value.status == 'IN'){
@@ -101,6 +90,7 @@ async function onScanSuccess(decodeResult){
                             });
                             
                         } else{
+                            isLoading.value = false
                             isIN.value = true
                             message.value = "WELCOME!!!";
                             student.value = {...student.value, ...{status: 'IN'}} //set status
@@ -118,20 +108,20 @@ async function onScanSuccess(decodeResult){
                             
                             //time in
                             await addDoc(collection(db, "studentLogs"), record.value)
-                           
                              
                          }
                          
                          lastScanned.value = scannedQrCodes.value
-                         getStudents()
-                         setInterval(() => {
-                            isStudent.value = false
-                         }, 5000)
+                         scannedQrCodes.value = ''
+                        //  setInterval(() => {
+                        //     isStudent.value = false
+                        //  }, 5000)
                     } catch(error){
                          console.error(error);
                     }
 
-            } else if (result.length === 0) {
+            } else {
+                isLoading.value = false
                 errmsg.value = "no match found";
                 isStudent.value = false;
                 student.value = null;
@@ -140,10 +130,7 @@ async function onScanSuccess(decodeResult){
                     errmsg.value = '';
                 }, 3000);
                 lastScanned.value = scannedQrCodes.value
-            } else {
-
-                lastScanned.value = scannedQrCodes.value
-            }
+            } 
 
         } else{
             show('error', 'error', 'Already scanned')
@@ -152,7 +139,6 @@ async function onScanSuccess(decodeResult){
 
 
 onMounted(async ()=>{
-    await getStudents()
     scannedQrCodes.value = ''
     createScanQRCodes()
 
@@ -182,7 +168,8 @@ onMounted(async ()=>{
                         <h1 class="text-3xl font-semibold text-white">CPSU LIBRARY SYSTEM</h1>
                     </div>
                     <div class="flex justify-center items-center h-96">
-                        <span v-if="errmsg">{{errmsg}}</span>
+                        <div class="loader" v-if="isLoading"></div>
+                        <span class="text-2xl text-red-500" v-else-if="errmsg">{{errmsg}}</span>
                         <div class="w-full max-w-sm py-10 m-10 bg-white border-gray-200 border-2 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700  bg-gradient-to-t from-white to-green-500 " v-else-if="isStudent">
                             
                             <div class="flex flex-col items-center pb-10">
@@ -196,13 +183,30 @@ onMounted(async ()=>{
                             </div>
                         </div>
                         <div class="flex justify-center items-center h-80" v-else>
-                            <div class="w-32 aspect-square rounded-full relative flex justify-center items-center animate-[spin_3s_linear_infinite] z-40 bg-[conic-gradient(white_0deg,white_300deg,transparent_270deg,transparent_360deg)] before:animate-[spin_2s_linear_infinite] before:absolute before:w-[60%] before:aspect-square before:rounded-full before:z-[80] before:bg-[conic-gradient(white_0deg,white_270deg,transparent_180deg,transparent_360deg)] after:absolute after:w-3/4 after:aspect-square after:rounded-full after:z-[60] after:animate-[spin_3s_linear_infinite] after:bg-[conic-gradient(#065f46_0deg,#065f46_180deg,transparent_180deg,transparent_360deg)]">
+                            <!-- <div class="w-32 aspect-square rounded-full relative flex justify-center items-center animate-[spin_3s_linear_infinite] z-40 bg-[conic-gradient(white_0deg,white_300deg,transparent_270deg,transparent_360deg)] before:animate-[spin_2s_linear_infinite] before:absolute before:w-[60%] before:aspect-square before:rounded-full before:z-[80] before:bg-[conic-gradient(white_0deg,white_270deg,transparent_180deg,transparent_360deg)] after:absolute after:w-3/4 after:aspect-square after:rounded-full after:z-[60] after:animate-[spin_3s_linear_infinite] after:bg-[conic-gradient(#065f46_0deg,#065f46_180deg,transparent_180deg,transparent_360deg)]">
                                 <span class="absolute w-[85%] aspect-square rounded-full z-[60] animate-[spin_5s_linear_infinite] bg-[conic-gradient(#34d399_0deg,#34d399_180deg,transparent_180deg,transparent_360deg)]">
                                 </span>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 <!-- </div> -->
             </div>
     </div>
 </template>
+<style scoped>
+/* HTML: <div class="loader"></div> */
+.loader {
+  width: 50px;
+  --b: 8px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #23b665;
+  -webkit-mask:
+    repeating-conic-gradient(#0000 0deg,#000 1deg 70deg,#0000 71deg 90deg),
+    radial-gradient(farthest-side,#0000 calc(100% - var(--b) - 1px),#000 calc(100% - var(--b)));
+  -webkit-mask-composite: destination-in;
+          mask-composite: intersect;
+  animation: l5 1s infinite;
+}
+@keyframes l5 {to{transform: rotate(.5turn)}}
+</style>
