@@ -6,6 +6,7 @@ import { useToast } from 'primevue/usetoast';
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from '@/stores/firebase.js'
 import BookDetails from '@/components/booksComp/bookDetails.vue'
+import CirculateForm from '@/components/booksComp/circulateBook.vue'
 
 const toast = useToast();
 
@@ -17,6 +18,7 @@ const dialogVisible = ref(false);
 const op = ref();
 const loading = ref(false)
 const viewBook = ref(false)
+const circulate = ref(false)
 
 const initFilters = () => {
     filters.value = {
@@ -100,8 +102,9 @@ onMounted(() => {
                 <div class="flex gap-2">
                     <Button type="button" icon="pi pi-filter-slash" label="Clear" outlined @click="clearFilter()" />
                     <!-- <Button icon="pi pi-external-link" label="Export Displayed" @click="exportCSV()" /> -->
-                    <Button icon="pi pi-external-link" label="Export All" @click="exportAllCSV()" />
-                    <Button icon="pi pi-arrow-up" label="Import" @click="openDialog('top')" />
+                    <Button icon="pi pi-file-export" label="Export All" @click="exportAllCSV()" />
+                    <Button icon="pi pi-file-import" label="Import" @click="openDialog('top')" />
+                    <Button icon="pi pi-book" label="Circulate Book" @click="circulate = true" />
                 </div>
 
                 <span class="relative">
@@ -149,8 +152,12 @@ onMounted(() => {
         <ImportBooks @formSuccess="onFormSuccess" />
     </Dialog>
 
-    <Dialog v-model:visible="viewBook" draggable="false" modal header="Book Information">
+    <Dialog v-model:visible="viewBook" :draggable="false" modal header="Book Information">
         <BookDetails />
+    </Dialog>
+
+    <Dialog v-model:visible="circulate" :draggable="false" modal header="Modal" :style="{ width: '25rem' }">
+        <CirculateForm />
     </Dialog>
 
     <Toast />
