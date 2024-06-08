@@ -64,8 +64,8 @@ const getStudent = async ()=>{
 <template>
     <loader v-if="isLoading"/>
       <section class="bg-gray-50 dark:bg-gray-900" v-else>
-        <div class=" px-4 mx-auto max-w-2xl  bg-white">
-            <div class="flex justify-between items-center p-5 ">
+        <div class="mx-auto max-w-2xl bg-white">
+            <div class="flex justify-between items-center p-5">
               <img src="/logo.png" width="50" alt="">
               <h1 class="font-bold text-2xl">CPSU Library</h1>
               <div class="flex items-center">
@@ -106,21 +106,19 @@ const getStudent = async ()=>{
                     </div>
               </div>
             </div>
-            <div class=" flex flex-col items-center bg-[url('/background.jpg')]">
+            <div class=" flex flex-col items-center">
                 <img :src="student.image" class="mt-10 border-4 border-green-600 rounded-full" width="100px" height="100px" alt="">
                 <span class="mb-4 text-xl font-bold text-gray-900 dark:text-white">{{ student.name }}</span>
-                <span class="text-gray-400">{{ student.course }}</span>
+                <span class="text-xl">{{ student.course }}</span><br>
             </div>
-            <div>
-                <div>
-                    <span class="ont-bold text-gray-900">Email</span>
-                    <div class="">
-                        <span>{{ student.email }}</span>
-                    </div>
-                </div>
-                <div class="w-full flex justify-center">
+            <div class="flex flex-col items-center gap-10 bg-gradient-to-l from-green-600 to-green-500 rounded-t-lg rounded-tr-full rounded-tl-full h-96">
+                <div class="p-5 bg-white border-4 border-gray-950">
                   <qrCode :id="student.id"/>
                 </div>
+                <div class="flex justify-center items-center gap-3 ">
+                    <img src="/logo.png" width="50" alt="">
+                    <h1 class="text-3xl font-bold" style="color:yellow; text-shadow: 0 0 5px black">CPSU LIBRARY</h1>
+                </div> 
             </div>
         </div>
       </section>

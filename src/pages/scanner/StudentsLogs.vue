@@ -15,7 +15,7 @@ const crud = useCrud()
 const { currentDate } = dateStore.getCurrentDate()
 const time = ref()
 
-
+//time update per second
 setInterval(async () => {
     const { currentTime, currentTimeInSeconds } = dateStore.getCurrentTime()
     time.value = currentTime
@@ -144,11 +144,10 @@ async function onScanSuccess(decodeResult){
                                 await crud.addDocument("studentLogs", record.value)
                                  
                              }
-                             
-                             scannedQrCodes.value = ''
-                            //  setInterval(() => {
+                             scann//  setInterval(() => {
                             //     isStudent.value = false
-                            //  }, 5000)
+                            //  }, 5000)edQrCodes.value = ''
+                            
                         } catch(error){
                              console.error(error);
                         }
