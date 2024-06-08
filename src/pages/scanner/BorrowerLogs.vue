@@ -40,6 +40,7 @@ const student = ref({})
 const isStudent = ref(false)
 
 async function onScanSuccess(decodeResult){
+        play()
         isLoading.value = true 
         scannedQrCodes.value = decodeResult
         // const result = students.value.filter(doc => doc.id == scannedQrCodes.value);
@@ -82,10 +83,18 @@ onMounted(async ()=>{
 
 })
 
+const audioPlayer = ref(null);
+const play = () => {
+      audioPlayer.value.play();
+    };
+
 
 </script>
 <template>
     <div class="flex items-center justify-around bg-[url('/background.jpg')]" style="height: 100vh">
+        <audio ref="audioPlayer">
+          <source src="/beep.mp3" type="audio/mpeg">
+        </audio>
         <Toast/>
             <div class="p-5 bg-white w-4/12 h-6/12 rounded-lg drop-shadow-lg">
                 <h1 class="text-2xl">Scan QR Code</h1>

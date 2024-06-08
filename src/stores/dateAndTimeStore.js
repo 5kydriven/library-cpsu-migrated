@@ -4,15 +4,25 @@ import { ref } from "vue";
 export const useTimeAndDate = defineStore('dateAndTime', () =>{
     
     const getCurrentTime = () =>{
-        var options = { timeZone: 'Asia/Manila', hour12: true, hour: '2-digit', minute: '2-digit' };
-        const currentTime = new Date().toLocaleTimeString('en-US', options);
-    
-        // Format the time string as "00:00 PM"
-        const formattedcurrentTime = currentTime.replace(/(\d{1,2}:\d{2})(:\d{2})?(\s*[ap]m)?/i, "$1 $3");
-    
-        return {
-            currentTime: formattedcurrentTime
-        };
+        let now = new Date();
+        let hours = now.getHours();
+        let minutes = now.getMinutes();
+        let seconds = now.getSeconds();
+        let ampm = hours >= 12 ? 'PM' : 'AM';
+
+        // Convert hours to 12-hour format
+        hours = hours % 12;
+        hours = hours ? hours : 12; // Handle midnight
+
+        // Add leading zeroes if necessary
+        hours = hours < 10 ? '0' + hours : hours;
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        seconds = seconds < 10 ? '0' + seconds : seconds;
+
+        const currentTime = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
+        const currentTimeInSeconds = hours * 3600 + minutes * 60 + seconds;
+
+        return { currentTime, currentTimeInSeconds };
     }
     
     

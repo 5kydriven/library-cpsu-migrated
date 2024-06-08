@@ -2,6 +2,7 @@
 import { onBeforeMount, onMounted, ref } from "vue";
 import { onAuthStateChanged } from "firebase/auth";
 import { useStorage } from "@/stores/imageUpload";
+import { useCrud } from "@/stores/useCrudStore";
 import { query, where, collection, onSnapshot, setDoc, doc, getDocs, getDoc, updateDoc } from "firebase/firestore";
 import { db, auth } from "@/stores/firebase.js";
 import loader from "@/components/loader.vue";
@@ -9,6 +10,7 @@ import loader from "@/components/loader.vue";
 // State Variables
 const isLoading = ref(false);
 const imageStore = useStorage();
+const crud = useCrud()
 const buttondisplay = ref();
 const icondisplay = ref();
 const idNumberGenerated = ref(1);
@@ -106,17 +108,14 @@ async function onSubmit(e) {
 
         if(e){
             studentData.value = { ...studentData.value, ...{ uid: uid.value, email: email.value, student_id: id.value } };
-
-            await setDoc(doc(db, "students", id.value), studentData.value);
-            console.log("added successfully");
+            await crud.setDocument("students", id.value, studentData.value)
 
         } else{
-            await updateDoc(doc(db, 'students', studentData.value.id), studentData.value);
-            console.log("update successful")
+            await crud.updateDocument('students', studentData.value.id, studentData.value)
         }
 
         // Increment idGenerator
-        await updateDoc(doc(db, 'idGenerator', 'KIMavxAVbS6PQn6Iyndk'), { count: newId });
+        await crud.updateDocument('idGenerator', 'KIMavxAVbS6PQn6Iyndk', { count: newId })
 
     } catch (error) {
         console.error(error);

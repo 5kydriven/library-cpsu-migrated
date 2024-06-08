@@ -1,6 +1,7 @@
 <script setup>
 import {computed, onMounted, ref} from 'vue'
 import { useTimeAndDate } from '@/stores/dateAndTimeStore';
+import { useCrud } from '@/stores/useCrudStore';
 import { Html5Qrcode } from 'html5-qrcode';
 import { doc, collection, getDocs, getDoc, updateDoc, setDoc, addDoc, query, where } from 'firebase/firestore';
 import { db } from '@/stores/firebase';
@@ -9,13 +10,51 @@ import { useToast } from "primevue/usetoast";
 const toast = useToast();
 const isLoading = ref(false)
 const dateStore = useTimeAndDate()
+const crud = useCrud()
 
 const { currentDate } = dateStore.getCurrentDate()
 const time = ref()
 
-setInterval(() => {
-    const { currentTime } = dateStore.getCurrentTime()
+
+setInterval(async () => {
+    const { currentTime, currentTimeInSeconds } = dateStore.getCurrentTime()
     time.value = currentTime
+    const sevenPMInSeconds = 19 * 3600;
+
+    // automatically update if time is 7 pm
+    if(currentTimeInSeconds > sevenPMInSeconds){
+        const queryStudent = query(
+            collection(db, 'students'),
+            where('status', '==', 'IN'),
+        );
+        const studentSnapshot = await getDocs(queryStudent);
+        if(!studentSnapshot.empty){
+            console.log("in but not out");
+            studentSnapshot.forEach(async student => {
+                const studentData = {...student.data(), ...{status: 'OUT'}}
+
+                const queryRecord = query(
+                    collection(db, 'studentLogs'),
+                    where('studentId', '==', student.id),
+                    where('status', '==', 'IN'),
+                    where('date', '==', currentDate.value),
+                );
+                const logsSnapshot = await getDocs(queryRecord);
+                logsSnapshot.forEach(async log => {
+                    
+                    const updatedRecord = {
+                        ...log.data(),
+                        time_out: 'unscanned',
+                        status: 'unscanned',
+                    };
+                    
+                    await crud.updateDocument('studentLogs', log.id, updatedRecord)
+                    
+                });
+                await crud.updateDocument('students', student.id,  studentData)
+            })
+        }
+    }
 }, 1000);
 
 const show = (sev, sum, msg) => {
@@ -42,6 +81,7 @@ const isStudent = ref(false)
 const isIN = ref( false)
 
 async function onScanSuccess(decodeResult){
+    play()
     scannedQrCodes.value = decodeResult
     if(lastScanned.value != decodeResult){
             lastScanned.value = scannedQrCodes.value
@@ -61,13 +101,12 @@ async function onScanSuccess(decodeResult){
                                 message.value = "GOODBYE!!!";
                                 student.value = {...student.value, ...{status: 'OUT'}} //set status
                                 const docRef = doc(db, 'students', scannedQrCodes.value)
-                                await updateDoc(docRef, student.value)
-    
-                                
+                                await crud.updateDocument('students', scannedQrCodes.value,  student.value)
+                                    
                                 //time out
                                 const queryRecord = query(
                                     collection(db, 'studentLogs'),
-                                    where('studentId', '==', 'CPSU-LRC-0003'),
+                                    where('studentId', '==', scannedQrCodes.value),
                                     where('status', '==', 'IN'),
                                     where('date', '==', currentDate.value),
                                 );
@@ -80,13 +119,8 @@ async function onScanSuccess(decodeResult){
                                         time_out: time.value,
                                         status: 'OUT',
                                     };
-    
-                                    try{
-                                        await updateDoc(doc(db, 'studentLogs', log.id), updatedRecord);
-                                        console.log("goodbye");
-                                    } catch(error){
-                                        console.error(error);
-                                    }
+                                    
+                                    await crud.updateDocument('studentLogs', log.id, updatedRecord)
                                     
                                 });
                                 
@@ -95,8 +129,7 @@ async function onScanSuccess(decodeResult){
                                 isIN.value = true
                                 message.value = "WELCOME!!!";
                                 student.value = {...student.value, ...{status: 'IN'}} //set status
-                                const docRef = doc(db, 'students', scannedQrCodes.value)
-                                await updateDoc(docRef, student.value)
+                                await crud.updateDocument('students', scannedQrCodes.value,  student.value)
                                 
                                 //logs record
                                 const record = ref({
@@ -108,7 +141,7 @@ async function onScanSuccess(decodeResult){
                                 })
                                 
                                 //time in
-                                await addDoc(collection(db, "studentLogs"), record.value)
+                                await crud.addDocument("studentLogs", record.value)
                                  
                              }
                              
@@ -148,11 +181,19 @@ onMounted(async ()=>{
 
 })
 
+const audioPlayer = ref(null);
+const play = () => {
+      audioPlayer.value.play();
+    };
+
 
 </script>
 <template>
     <!-- <loader v-if="isLoading"/> -->
     <div class="flex items-center justify-around bg-[url('/background.jpg')]" style="height: 100vh" >
+        <audio ref="audioPlayer">
+          <source src="/beep.mp3" type="audio/mpeg">
+        </audio>
         <Toast/>
             <div class="p-5 bg-white w-4/12 h-6/12 rounded-lg drop-shadow-lg">
                 <h1 class="text-2xl">Scan QR Code</h1>
@@ -163,7 +204,8 @@ onMounted(async ()=>{
                     <Button @click="onScanSuccess(studentId)" label="Submit" severity="success"/>
                 </div>
                 {{ currentDate }}
-                {{time}}
+                {{time}}<br>
+                <!-- <button @click="crud.deleteAllDocuments('studentLogs')"> Delete all</button> -->
             </div>
             <div class=" bg-white rounded-lg h-6/12 w-5/12 drop-shadow-sm"> 
                 <!-- <div> -->
