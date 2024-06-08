@@ -11,8 +11,8 @@ const isLoading = ref(false)
 const dateStore = useTimeAndDate()
 
 const { currentDate } = dateStore.getCurrentDate()
-
 const time = ref()
+
 setInterval(() => {
     const { currentTime } = dateStore.getCurrentTime()
     time.value = currentTime

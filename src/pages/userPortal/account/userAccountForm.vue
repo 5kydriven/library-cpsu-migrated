@@ -1,95 +1,131 @@
 <script setup>
 import { onBeforeMount, onMounted, ref } from "vue";
 import { onAuthStateChanged } from "firebase/auth";
-import {useStorage} from "@/stores/imageUpload";
-import { collection, onSnapshot, setDoc, doc, getDocs } from "firebase/firestore"; 
+import { useStorage } from "@/stores/imageUpload";
+import { query, where, collection, onSnapshot, setDoc, doc, getDocs, getDoc, updateDoc } from "firebase/firestore";
 import { db, auth } from "@/stores/firebase.js";
 import loader from "@/components/loader.vue";
 
+// State Variables
 const isLoading = ref(false);
-const imageStore = useStorage()
-
+const imageStore = useStorage();
 const buttondisplay = ref();
 const icondisplay = ref();
-
-const idNumberGenerated = ref(1)
-const id = ref()
-
+const idNumberGenerated = ref(1);
+const id = ref();
+const isNew = ref();
 const studentData = ref({
     image: '',
     name: "",
-    dob: '',
     gender: "",
     course: "",
     year: "",
     address: "",
-})
+});
+const uid = ref();
+const email = ref();
+const image = ref(null);
+let file;
+let newId;
 
-const uid = ref()
-const email = ref()
+// Initialization
 onMounted(() => {
-    onAuthStateChanged(auth, (userDetails) => {
-        console.log(userDetails);
+    isLoading.value = true
+    onAuthStateChanged(auth, async (userDetails) => {
         if (userDetails) {
-          uid.value = userDetails.uid;
-          email.value = userDetails.email
-          getStudents()
-        //   router.push( "/dashboard" );
+            uid.value = userDetails.uid;
+            email.value = userDetails.email;
+            await checkStudentExistence();
+            await getNewId();
         } else {
-          // isLoading.value = false;
-          console.log("not signed in");
-        //   router.replace({ name: "signin" });         
+            console.log("not signed in");
         }
-        // isLoading.value = true;
-      });
+    });
+});
 
-})
+// Functions
+async function checkStudentExistence() {
+    try {
+        const queryStudent = query(collection(db, 'students'), where('uid', '==', uid.value));
+        const studentSnap = await getDocs(queryStudent);
 
-async function getStudents() {
-    try{
-        const querySnapshot = await getDocs(collection(db, "students"));
-        querySnapshot.forEach((doc) => {
-            idNumberGenerated.value++
-        });
-        id.value = "CPSU-LRC-000" + idNumberGenerated.value.toString();
-        studentData.value = {...studentData.value, ...{uid: uid.value ,email: email.value, student_id: id.value}}
-    } catch(error){
-        console.error("error fetching data",error);
+        if (!studentSnap.empty) {
+            isNew.value = false;
+            studentSnap.forEach(doc => {
+                studentData.value = {...studentData.value, ...doc.data()};
+            });
+        } else {
+            isNew.value = true
+            console.log("not exist");
+        }
+    } catch (error) {
+        console.error("Error checking student existence: ", error);
     }
 }
 
+async function getNewId() {
+    try {
+        const docRef = doc(db, "idGenerator", 'KIMavxAVbS6PQn6Iyndk');
+        const docSnap = await getDoc(docRef);
 
-const image = ref(null);
-let file;
+        idNumberGenerated.value = docSnap.data();
+        newId = idNumberGenerated.value.count + 1;
+        id.value = "CPSU-LRC-000" + newId.toString();
+
+        if(isNew){
+            studentData.value = { ...studentData.value, ...{ uid: uid.value, email: email.value, student_id: id.value } };
+        } else{
+
+        }
+
+        isLoading.value = false
+    } catch (error) {
+        console.error("error fetching data", error);
+    }
+}
 
 // Method to handle file change
-function onFileChange (e) {
-  file = e.target.files[0];
-  if (!file) {
-    console.log("no image selected/ or invalid image");
-  }
-  const reader = new FileReader();
+function onFileChange(e) {
+    file = e.target.files[0];
+    if (!file) {
+        console.log("no image selected/ or invalid image");
+        return;
+    }
+    const reader = new FileReader();
 
-  reader.onload = (e) => {
-    image.value = e.target.result;
-  };
+    reader.onload = (e) => {
+        image.value = e.target.result;
+    };
 
-  reader.readAsDataURL(file);
-};
+    reader.readAsDataURL(file);
+}
 
-async function onSubmit(){
-    isLoading.value = true
-    try{
-        if(file){
-            await imageStore.upload('students_image/', file)
-            const { imageUrl } = await imageStore.useFirebaseStorage('students_image/', file.name)
-            studentData.value.image = imageUrl
+async function onSubmit() {
+    isLoading.value = true;
+    if (file) {
+        await imageStore.upload('students_image/', file);
+        const { imageUrl } = await imageStore.useFirebaseStorage('students_image/', file.name);
+        studentData.value.image = imageUrl;
+    }
+
+    try {
+        
+        if(isNew){
+            await setDoc(doc(db, "students", id.value), studentData.value);
+            console.log("added successfully");
+
+        } else{
+            await updateDoc(doc(db, 'students', studentData.value.id), studentData.value);
+            console.log("update successful")
         }
-        await setDoc(doc(db, "students", id.value), studentData.value);
-        console.log("added successfully");
-        isLoading.value = false
-    } catch(error){
+
+        // Increment idGenerator
+        await updateDoc(doc(db, 'idGenerator', 'KIMavxAVbS6PQn6Iyndk'), { count: newId });
+
+    } catch (error) {
         console.error(error);
+    } finally {
+        isLoading.value = false;
     }
 }
 
@@ -98,13 +134,13 @@ async function onSubmit(){
     <loader v-if="isLoading"/>
     <section class="bg-gray-50 dark:bg-gray-900" v-else>
     <div class="py-8 px-4 mx-auto max-w-2xl lg:py-16 bg-white">
-        <h2 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">Complete profile</h2>
+        <h2 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">{{isNew? 'Complete' : 'update'}} profile</h2>
         <form @submit.prevent="onSubmit">
             <div class="w-full">
                 <div class="flex items-center justify-center w-full">
                     <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
-                        <div v-if="image">
-                            <img :src="image" width="150px" alt="">
+                        <div v-if="image || studentData.image">
+                            <img :src="image? image : studentData.image" width="150px" alt="">
                         </div>
                         <div class="flex flex-col items-center justify-center pt-5 pb-6" v-else>
                             <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
@@ -120,11 +156,7 @@ async function onSubmit(){
             <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
                 <div class="w-full">
                     <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
-                    <input v-model="studentData.name" type="text" name="name" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Enter your fullname" required="">
-                </div>
-                <div class="w-full">
-                    <label for="buttondisplay" class="font-bold block mb-2"> Button Display </label>
-                    <Calendar v-model="studentData.dob" showIcon inputId="buttondisplay" />
+                    <input v-model="studentData.name" type="text" name="name" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg outline-0 focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Enter your fullname" required="">
                 </div>
                 <div>
                     <label for="course" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Course</label>
@@ -148,10 +180,12 @@ async function onSubmit(){
                 </div>
                 <div class="w-full">
                     <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address</label>
-                    <input v-model="studentData.address" type="text" name="address" id="address" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Enter Address" required="">
+                    <input v-model="studentData.address" type="text" name="address" id="address" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg outline-0 focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Enter Address" required="">
                 </div>
             </div>
-            <Button @click="onSubmit" label="submit" class="my-5"/>
+            <div class="flex justify-center">
+                <Button @click="onSubmit" label="submit" class="my-5"/>
+            </div>
         </form>
     </div>
     </section>

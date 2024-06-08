@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted, ref } from 'vue';
+import { RouterLink } from 'vue-router';
 import { onAuthStateChanged } from 'firebase/auth';
 import { query, collection, where, getDocs } from 'firebase/firestore';
 import { db, auth } from '@/stores/firebase';
@@ -46,7 +47,7 @@ const student = ref({})
 
 const getStudent = async ()=>{
     const queryStudent = query(collection(db, 'students'), where('uid', '==', uid.value));
-    
+
     try {
         const querySnapshot = await getDocs(queryStudent);
             querySnapshot.forEach((doc) => {
@@ -71,7 +72,7 @@ const getStudent = async ()=>{
                     <div class="flex items-center ms-3">
                         <div>
                             <button type="button" @click="OpToggle"
-                                class="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+                                class="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-green-500 dark:focus:ring-green-600"
                                 aria-expanded="false" data-dropdown-toggle="dropdown-user">
                                 <span class="sr-only">Open user menu</span>
                                 <img class="w-8 h-8 rounded-full"
@@ -93,9 +94,7 @@ const getStudent = async ()=>{
                                 <hr>
                                 <ul class="py-1" role="none">
                                     <li>
-                                        <a href="#"
-                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
-                                            role="menuitem">Settings</a>
+                                        <router-link  to="user-account" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">Edit profile</router-link>
                                     </li>
                                     <li>
                                         <a @click.prevent="store.logoutUser" class="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
