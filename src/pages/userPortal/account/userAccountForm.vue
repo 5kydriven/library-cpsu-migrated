@@ -72,12 +72,6 @@ async function getNewId() {
         newId = idNumberGenerated.value.count + 1;
         id.value = "CPSU-LRC-000" + newId.toString();
 
-        if(isNew){
-            studentData.value = { ...studentData.value, ...{ uid: uid.value, email: email.value, student_id: id.value } };
-        } else{
-
-        }
-
         isLoading.value = false
     } catch (error) {
         console.error("error fetching data", error);
@@ -100,7 +94,7 @@ function onFileChange(e) {
     reader.readAsDataURL(file);
 }
 
-async function onSubmit() {
+async function onSubmit(e) {
     isLoading.value = true;
     if (file) {
         await imageStore.upload('students_image/', file);
@@ -109,8 +103,10 @@ async function onSubmit() {
     }
 
     try {
-        
-        if(isNew){
+
+        if(e){
+            studentData.value = { ...studentData.value, ...{ uid: uid.value, email: email.value, student_id: id.value } };
+
             await setDoc(doc(db, "students", id.value), studentData.value);
             console.log("added successfully");
 
@@ -184,7 +180,7 @@ async function onSubmit() {
                 </div>
             </div>
             <div class="flex justify-center">
-                <Button @click="onSubmit" label="submit" class="my-5"/>
+                <Button @click="onSubmit(isNew? true : false)" label="submit" class="my-5"/>
             </div>
         </form>
     </div>
