@@ -14,7 +14,7 @@ export const useAdminStore = defineStore('admin', () => {
         onSnapshot(collection(db, "students"), (querySnapshot) => {
             const student = [];
             querySnapshot.forEach((doc) => {
-                student.push({ ...doc.data() });
+                student.push({ ...doc.data(), id: doc.id });
             });
             students.value = student
             loading.value = false;
