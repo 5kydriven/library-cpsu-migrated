@@ -34,7 +34,7 @@ onMounted(() => {
     <h1 class="text-2xl font-bold mb-4">Student Logs</h1>
     <DataTable :value="products" tableStyle="min-width: 50rem" v-model:filters="filters"
         :globalFilterFields="['name', 'quantity', 'code', 'category']" ref="dt" removableSort  stripedRows
-        scrollable scrollHeight="500px">
+        scrollable scrollHeight="400px">
         <template #header>
             <div class="flex justify-between">
                 <div class="flex gap-2">

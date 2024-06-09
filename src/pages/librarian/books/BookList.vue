@@ -96,7 +96,7 @@ onMounted(() => {
     <h1 class="text-2xl font-bold mb-4">Books List</h1>
     <DataTable :value="books" tableStyle="min-width: 50rem" v-model:filters="filters" :loading="loading"
         :virtualScrollerOptions="{ itemSize: 46 }" :globalFilterFields="['title', 'college', 'callNumber', 'borrowed']"
-        removableSort stripedRows dataKey="id" scrollable scrollHeight="500px" filterDisplay="menu">
+        removableSort stripedRows dataKey="id" scrollable scrollHeight="400px" filterDisplay="menu">
         <template #header>
             <div class="flex justify-between">
                 <div class="flex gap-2">

@@ -40,7 +40,7 @@
         </div>
         <div class="flex justify-between border shadow shadow-2 p-3 border-round">
             <div>
-                <span class="block text-xl font-medium mb-3">Book's Returned today</span>
+                <span class="block text-xl font-medium mb-3">Book's Returned</span>
                 <div class="text-gray-900 font-medium text-lg">0</div>
             </div>
             <div class="flex items-center justify-center bg-primary-100 border-round"

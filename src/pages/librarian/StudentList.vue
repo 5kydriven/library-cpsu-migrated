@@ -34,7 +34,7 @@ onMounted(() => {
 <template>
     <h1 class="text-2xl font-bold mb-4">Students List</h1>
     <DataTable :value="adminStore.students" v-model:filters="filters" tableStyle="min-width: 50rem"
-        :globalFilterFields="['name']" ref="dt" removableSort stripedRows scrollable scrollHeight="500px"
+        :globalFilterFields="['name']" ref="dt" removableSort stripedRows scrollable scrollHeight="400px"
         :loading="adminStore.loading" dataKey="id" :virtualScrollerOptions="{ itemSize: 46 }">
         <template #header>
             <div class="flex justify-between">
