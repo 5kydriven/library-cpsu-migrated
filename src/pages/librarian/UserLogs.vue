@@ -1,6 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useAdminStore } from '@/stores/adminStore';
 import { ProductService } from '../../service/productService.js';
+
+const store = useAdminStore();
 
 const products = ref();
 const filters = ref();
@@ -27,14 +30,15 @@ const exportCSV = () => {
 };
 
 onMounted(() => {
+    store.fetchLogs();
     ProductService.getProducts().then((data) => (products.value = data));
 });
 </script>
 <template>
     <h1 class="text-2xl font-bold mb-4">Student Logs</h1>
-    <DataTable :value="products" tableStyle="min-width: 50rem" v-model:filters="filters"
-        :globalFilterFields="['name', 'quantity', 'code', 'category']" ref="dt" removableSort  stripedRows
-        scrollable scrollHeight="400px">
+    <DataTable :value="store.logs" tableStyle="min-width: 50rem" v-model:filters="filters"
+        :globalFilterFields="['name', 'quantity', 'code', 'category']" ref="dt" removableSort stripedRows scrollable
+        scrollHeight="400px" :loading="store.loading" :virtualScrollerOptions="{ itemSize: 46 }">
         <template #header>
             <div class="flex justify-between">
                 <div class="flex gap-2">
@@ -50,11 +54,16 @@ onMounted(() => {
                 </span>
             </div>
         </template>
-        <template #empty> No customers found. </template>
-        <Column field="code" header="Library ID"></Column>
-        <Column field="name" sortable header="Name"></Column>
-        <Column field="category" header="Course/Year"></Column>
-        <Column field="quantity" header="Time In"></Column>
+        <template #empty> No students found.</template>
+        <Column header="#">
+            <template #body="slotProps">
+                {{ slotProps.index + 1 }}
+            </template>
+        </Column>
+        <Column field="studentId" header="Library ID"></Column>
+        <Column header="Name"></Column>
+        <Column header="Course/Year"></Column>
+        <Column header="Time In"></Column>
         <Column header="Time Out"></Column>
         <Column header="Date"></Column>
     </DataTable>

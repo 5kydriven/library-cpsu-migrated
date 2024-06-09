@@ -19,6 +19,7 @@ const op = ref();
 const loading = ref(false)
 const viewBook = ref(false)
 const circulate = ref(false)
+const selectedBook = ref(null); // New reactive variable to store selected book ID
 
 const initFilters = () => {
     filters.value = {
@@ -29,7 +30,8 @@ const initFilters = () => {
     };
 };
 
-const toggle = (event) => {
+const toggle = (data) => {
+    selectedBook.value = data;
     op.value.toggle(event);
 }
 
@@ -80,7 +82,7 @@ const loadLazyData = () => {
     onSnapshot(collection(db, "books"), (querySnapshot) => {
         const book = [];
         querySnapshot.forEach((doc) => {
-            book.push({ ...doc.data() });
+            book.push({ id: doc.id, ...doc.data() });
         });
         books.value = book;
         loading.value = false;
@@ -126,18 +128,17 @@ onMounted(() => {
         <Column header="borrowed"></Column>
         <Column header="Actions" class="text-center">
             <template #body="{ data }">
-                <i class="pi pi-ellipsis-v cursor-pointer" @click="toggle"></i>
+                <i class="pi pi-ellipsis-v cursor-pointer" @click="toggle(data)"></i>
                 <OverlayPanel ref="op">
                     <div
                         class="z-10 w-28 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
                         <ul class="py-1 text-sm text-gray-700 dark:text-gray-200">
                             <li>
-                                <a href="#"
-                                    class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                                    @click="viewBook = true">Show</a>
+                                <a class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                                    @click="viewBook = true">View more</a>
                             </li>
                             <li>
-                                <a href="#"
+                                <a
                                     class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Edit</a>
                             </li>
                         </ul>
@@ -153,7 +154,7 @@ onMounted(() => {
     </Dialog>
 
     <Dialog v-model:visible="viewBook" :draggable="false" modal header="Book Information">
-        <BookDetails />
+        <BookDetails :book="selectedBook" />
     </Dialog>
 
     <Dialog v-model:visible="circulate" :draggable="false" modal header="Modal" :style="{ width: '25rem' }">
