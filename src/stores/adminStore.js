@@ -6,6 +6,7 @@ import { db } from './firebase';
 export const useAdminStore = defineStore('admin', () => {
     const students = ref();
     const books = ref();
+    const logs = ref();
     const loading = ref(false);
 
     const fetchStudents = () => {
@@ -34,11 +35,26 @@ export const useAdminStore = defineStore('admin', () => {
         });
     }
 
+    const fetchLogs = () => {
+        loading.value = true;
+
+        onSnapshot(collection(db, "studentLogs"), (querySnapshot) => {
+            const log = [];
+            querySnapshot.forEach((doc) => {
+                log.push({ ...doc.data() });
+            });
+            logs.value = log;
+            loading.value = false;
+        });
+    }
+
     return {
         students,
         loading,
         fetchStudents,
         books,
         fetchBooks,
+        logs,
+        fetchLogs,
     }
 })
