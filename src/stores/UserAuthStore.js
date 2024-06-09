@@ -1,5 +1,4 @@
 import {
-  getAuth,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   signInWithEmailAndPassword,
@@ -47,24 +46,26 @@ export const useAuthStore = defineStore("authStore", () => {
   };
 
   const createUser = async (credentials) => {
-    const errMsg = ref()
     try {
-      const user = await createUserWithEmailAndPassword(getAuth(), credentials.email, credentials.password);
-      await setDoc(doc(db, "accountRoles", user.uid), { role: 'student' });
+      const userCredential = await createUserWithEmailAndPassword(auth, credentials.email, credentials.password);
+      // console.log(user.uid)
+      await setDoc(doc(db, "accountRoles", userCredential.user.uid), { role: 'student' });
       console.log("Account created successfuly");
     } catch (error) {
+      console.log(error)
+      let errMsg;
       switch (error.code) {
         case 'auth/invalid-email':
-          errMsg.value = "Invalid email"
+          errMsg = "Invalid email"
           break;
         case 'auth/email-already-in-use':
-          errMsg.value = "Email already in use"
+          errMsg = "Email already in use"
           break;
         case 'auth/weak-password':
-          errMsg.value = "weak password"
+          errMsg = "weak password"
           break;
         case 'auth/missing-password':
-          errMsg.value = "password must not be empty"
+          errMsg = "password must not be empty"
           break;
         default:
           break;
