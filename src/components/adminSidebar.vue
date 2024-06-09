@@ -21,22 +21,22 @@ const transactions = ref([
     }
 ]);
 
-const books = ref([
-    {
-        label: 'Books',
-        icon: 'library_books',
-        items: [
-            {
-                label: 'Book List',
-                route: '/books-list'
-            },
-            {
-                label: 'Books Location',
-                route: '/books-location'
-            }
-        ]
-    }
-]);
+// const books = ref([
+//     {
+//         label: 'Books',
+//         icon: 'library_books',
+//         items: [
+//             {
+//                 label: 'Book List',
+//                 route: '/books-list'
+//             },
+//             {
+//                 label: 'Books Location',
+//                 route: '/books-location'
+//             }
+//         ]
+//     }
+// ]);
 </script>
 
 <template>
@@ -64,7 +64,14 @@ const books = ref([
                     </RouterLink>
                 </li>
                 <li>
-                    <PanelMenu :model="books">
+                    <RouterLink to="/students-list"
+                        class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                        <span class="material-icons-outlined">
+                            library_books
+                        </span>
+                        <span class="flex-1 ms-3 whitespace-nowrap">Books</span>
+                    </RouterLink>
+                    <!-- <PanelMenu :model="books">
                         <template #item="{ item }">
                             <router-link v-if="item.route" v-slot="{ href, navigate }" :to="item.route" custom>
                                 <a class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
@@ -81,7 +88,7 @@ const books = ref([
                                 <span v-if="item.items" class="pi pi-angle-down text-primary ml-auto" />
                             </a>
                         </template>
-                    </PanelMenu>
+                    </PanelMenu> -->
                 </li>
                 <li>
                     <RouterLink to="/student-logs"
