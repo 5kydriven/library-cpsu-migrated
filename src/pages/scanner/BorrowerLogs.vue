@@ -116,7 +116,8 @@ const play = () => {
                         <div class="w-full max-w-sm py-10 m-10 bg-white border-gray-200 border-2 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700  bg-gradient-to-t from-white to-green-500 " v-else-if="isStudent">
                             
                             <div class="flex flex-col items-center pb-10">
-                                <img class="w-24 h-24 mb-3 rounded-full shadow-lg" :src="student.image" alt="Bonnie image"/>
+                                <img class="w-24 h-24 mb-3 rounded-full shadow-lg border-4 border-green-700" :src="student.image" v-if="student.image"/>
+                                <img class="w-24 h-24 mb-3 rounded-full shadow-lg border-4 border-green-700" src="/default.jpg" v-else/>
                                 <h5 class="mb-1 text-xl font-medium text-gray-900 dark:text-white">{{ student.name }}</h5>
                                 <span class="text-sm text-gray-500 dark:text-gray-400">{{ student.course }} {{ student.year }}</span>
                                 <div class="flex gap-5 mt-4 md:mt-6">

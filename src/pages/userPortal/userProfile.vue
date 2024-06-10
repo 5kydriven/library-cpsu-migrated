@@ -77,7 +77,10 @@ const getStudent = async ()=>{
                                 <span class="sr-only">Open user menu</span>
                                 <img class="w-8 h-8 rounded-full"
                                     :src="student.image"
-                                    alt="user photo">
+                                    alt="user photo" v-if="student.image">
+                                <img class="w-8 h-8 rounded-full"
+                                    src="/default.jpg"
+                                    alt="user photo" v-else>
                             </button>
                         </div>
                         <OverlayPanel ref="op">
@@ -107,9 +110,10 @@ const getStudent = async ()=>{
               </div>
             </div>
             <div class=" flex flex-col items-center">
-                <img :src="student.image" class="mt-10 border-4 border-green-600 rounded-full" width="100px" height="100px" alt="">
+                <img :src="student.image" class="mt-10 border-4 border-green-600 rounded-full" width="100px" height="100px" alt="" v-if="student.image">
+                <img src="/default.jpg" class="mt-10 border-4 border-green-600 rounded-full" width="100px" height="100px" alt="" v-else>
                 <span class="mb-4 text-xl font-bold text-gray-900 dark:text-white">{{ student.name }}</span>
-                <span class="text-xl">{{ student.course }}</span><br>
+                <span class="text-xl font-bold">{{ student.course }}</span><br>
             </div>
             <div class="flex flex-col items-center gap-10 bg-gradient-to-l from-green-600 to-green-500 rounded-t-lg rounded-tr-full rounded-tl-full h-96">
                 <div class="p-5 bg-white border-4 border-gray-950">
