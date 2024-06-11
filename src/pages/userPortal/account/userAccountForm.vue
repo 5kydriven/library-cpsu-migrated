@@ -105,6 +105,8 @@ async function onSubmit(e) {
         await imageStore.upload('students_image/', file);
         const { imageUrl } = await imageStore.useFirebaseStorage('students_image/', file.name);
         studentData.value.image = imageUrl;
+    } else{
+        console.log("no file selected");
     }
 
     try {
@@ -112,13 +114,13 @@ async function onSubmit(e) {
         if(e){
             studentData.value = { ...studentData.value, ...{ uid: uid.value, email: email.value, student_id: id.value } };
             await crud.setDocument("students", id.value, studentData.value)
-
+            // Increment idGenerator
+            await crud.updateDocument('idGenerator', 'KIMavxAVbS6PQn6Iyndk', { count: newId })
+            
         } else{
-            await crud.updateDocument('students', studentData.value.id, studentData.value)
+            await crud.updateDocument('students', studentData.value.student_id, studentData.value)
         }
-
-        // Increment idGenerator
-        await crud.updateDocument('idGenerator', 'KIMavxAVbS6PQn6Iyndk', { count: newId })
+            
         router.push('/user-profile')
 
     } catch (error) {
