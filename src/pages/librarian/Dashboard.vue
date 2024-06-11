@@ -1,3 +1,18 @@
+<script setup>
+import LineChart from '@/components/charts/lineChart.vue';
+import PieChart from '@/components/charts/pieChart.vue';
+import { useAdminStore } from '@/stores/adminStore';
+import { onMounted } from 'vue';
+
+const store = useAdminStore();
+
+
+onMounted(() => {
+    store.fetchBooks();
+    store.fetchStudents();
+})
+</script>
+
 <template>
     <h1 class="text-2xl font-bold mb-4">Dashboard</h1>
 
@@ -5,7 +20,7 @@
         <div class="flex justify-between border shadow shadow-2 p-3 border-round">
             <div>
                 <span class="block text-xl font-medium mb-3">Student's</span>
-                <div class="text-gray-900 font-medium text-lg">152</div>
+                <div class="text-gray-900 font-medium text-lg">{{ store.totalStudents }}</div>
             </div>
             <div class="flex items-center justify-center bg-primary-100 border-round"
                 style="width:2.5rem;height:2.5rem">
@@ -17,7 +32,7 @@
         <div class="flex justify-between border shadow shadow-2 p-3 border-round">
             <div>
                 <span class="block text-xl font-medium mb-3">Book's</span>
-                <div class="text-gray-900 font-medium text-lg">2451</div>
+                <div class="text-gray-900 font-medium text-lg">{{ store.totalBooks }}</div>
             </div>
             <div class="flex items-center justify-center bg-primary-100 border-round"
                 style="width:2.5rem;height:2.5rem">
@@ -61,8 +76,3 @@
         </div>
     </div>
 </template>
-
-<script setup>
-import LineChart from '@/components/charts/lineChart.vue';
-import PieChart from '@/components/charts/pieChart.vue';
-</script>

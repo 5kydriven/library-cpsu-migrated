@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia';
 import { collection, onSnapshot } from "firebase/firestore";
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { db } from './firebase';
 
 export const useAdminStore = defineStore('admin', () => {
-    const students = ref();
-    const books = ref();
+    const students = ref([]);
+    const books = ref([]);
     const logs = ref();
     const loading = ref(false);
 
@@ -48,6 +48,10 @@ export const useAdminStore = defineStore('admin', () => {
         });
     }
 
+
+    const totalStudents = computed(() => students.value.length);
+    const totalBooks = computed(() => books.value.length);
+
     return {
         students,
         loading,
@@ -56,5 +60,7 @@ export const useAdminStore = defineStore('admin', () => {
         fetchBooks,
         logs,
         fetchLogs,
+        totalStudents,
+        totalBooks
     }
 })
