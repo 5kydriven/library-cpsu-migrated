@@ -6,8 +6,10 @@ import { useCrud } from "@/stores/useCrudStore";
 import { query, where, collection, onSnapshot, setDoc, doc, getDocs, getDoc, updateDoc } from "firebase/firestore";
 import { db, auth } from "@/stores/firebase.js";
 import loader from "@/components/loader.vue";
+import { useRouter } from "vue-router";
 
 // State Variables
+const router = useRouter()
 const isLoading = ref(false);
 const imageStore = useStorage();
 const crud = useCrud()
@@ -37,6 +39,7 @@ onMounted(() => {
         if (userDetails) {
             uid.value = userDetails.uid;
             email.value = userDetails.email;
+            studentData.value = {...studentData.value, ...{name: userDetails.displayName}}
             await checkStudentExistence();
             await getNewId();
         } else {
@@ -116,6 +119,7 @@ async function onSubmit(e) {
 
         // Increment idGenerator
         await crud.updateDocument('idGenerator', 'KIMavxAVbS6PQn6Iyndk', { count: newId })
+        router.push('/user-profile')
 
     } catch (error) {
         console.error(error);
@@ -141,17 +145,24 @@ async function onSubmit(e) {
                             <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
                             </svg>
-                            <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
+                            <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span></p>
                         </div>
                         <input @change="onFileChange"  id="dropzone-file" type="file" class="hidden" />
                     </label>
                 </div> 
             </div>
             <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
-                <div class="w-full">
+                <div class="w-full" v-if="!isNew">
                     <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
-                    <input v-model="studentData.name" type="text" name="name" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg outline-0 focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Enter your fullname" required="">
+                    <input v-model="studentData.name" type="text" name="name" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg outline-0 focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Enter Address" required="">
+                </div>
+                <div>
+                    <label for="gender" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Gender</label>
+                    <select v-model="studentData.gender" id="gender" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                        <option selected="">Select gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
                 </div>
                 <div>
                     <label for="course" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Course</label>

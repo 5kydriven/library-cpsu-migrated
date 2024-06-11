@@ -1,4 +1,5 @@
 <script setup>
+import { getAuth, updateProfile } from "firebase/auth";
 import { useAuthStore } from "@/stores/UserAuthStore";
 import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
@@ -7,6 +8,7 @@ const router = useRouter()
 const store = useAuthStore()
 const isLogin = ref(true)
 
+const name = ref()
 const credentials = reactive({
     email: "",
     password: "",
@@ -25,7 +27,12 @@ const onSubmit = async (isNew) => {
         if (res) {
             if (res.error) loginErr.value = res.message
         } else {
-            router.push("/user-account")
+            const auth = getAuth();
+            await updateProfile(auth.currentUser, {
+                displayName: name.value
+            }).then(()=>{
+                router.push("/user-account");
+            })
         }
     } else {
         const res = await store.loginUser(credentials);
@@ -59,6 +66,12 @@ const onSubmit = async (isNew) => {
                     <div class="flex items-center justify-center font-semibold p-2 mb-2 text-sm text-red-700 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800"
                         role="alert" v-if="loginErr">
                         <div>{{ loginErr }}</div>
+                    </div>
+                    <div v-if="!isLogin">
+                        <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
+                        <input type="text" name="name" id="name"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="enter your name" required v-model="name" />
                     </div>
                     <div>
                         <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your
