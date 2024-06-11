@@ -49,11 +49,11 @@ const router = createRouter({
           name: 'books-list',
           component: () => import('@/pages/librarian/books/BookList.vue'),
         },
-        {
-          path: '/books-location',
-          name: 'books-location',
-          component: () => import('@/pages/librarian/books/BookLocation.vue'),
-        },
+        // {
+        //   path: '/books-location',
+        //   name: 'books-location',
+        //   component: () => import('@/pages/librarian/books/BookLocation.vue'),
+        // },
         {
           path: '/student-logs',
           name: 'student-logs',
