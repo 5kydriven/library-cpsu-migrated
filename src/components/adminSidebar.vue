@@ -1,8 +1,6 @@
 <script setup>
 import { ref } from "vue";
-import { useRouter, RouterLink } from "vue-router";
-
-const router = useRouter();
+import { RouterLink } from "vue-router";
 
 const transactions = ref([
     {
@@ -64,7 +62,7 @@ const transactions = ref([
                     </RouterLink>
                 </li>
                 <li>
-                    <RouterLink to="/students-list"
+                    <RouterLink to="/books-list"
                         class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                         <span class="material-icons-outlined">
                             library_books
@@ -88,7 +86,7 @@ const transactions = ref([
                                 <span v-if="item.items" class="pi pi-angle-down text-primary ml-auto" />
                             </a>
                         </template>
-                    </PanelMenu> -->
+</PanelMenu> -->
                 </li>
                 <li>
                     <RouterLink to="/student-logs"
@@ -112,7 +110,7 @@ const transactions = ref([
                             <a v-else
                                 class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
                                 :href="item.url" :target="item.target">
-                                <span class="material-icons-outlined">{{item.icon}}</span>
+                                <span class="material-icons-outlined">{{ item.icon }}</span>
                                 <span class="ml-2">{{ item.label }}</span>
                                 <span v-if="item.items" class="pi pi-angle-down text-primary ml-auto" />
                             </a>
