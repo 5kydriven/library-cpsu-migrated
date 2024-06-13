@@ -1,11 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useAdminStore } from '@/stores/adminStore';
-import { ProductService } from '../../service/productService.js';
 
 const store = useAdminStore();
 
-const products = ref();
 const filters = ref();
 const dt = ref();
 
@@ -13,9 +11,8 @@ const initFilters = () => {
     filters.value = {
         global: { value: null, },
         name: { value: null },
-        category: { value: null },
-        quantity: { value: null },
-        code: { value: null },
+        course: { value: null },
+        studentId: { value: null },
     };
 };
 
@@ -31,14 +28,13 @@ const exportCSV = () => {
 
 onMounted(() => {
     store.fetchLogs();
-    ProductService.getProducts().then((data) => (products.value = data));
 });
 </script>
 <template>
     <h1 class="text-2xl font-bold mb-4">Student Logs</h1>
     <DataTable :value="store.logs" tableStyle="min-width: 50rem" v-model:filters="filters"
-        :globalFilterFields="['name', 'quantity', 'code', 'category']" ref="dt" removableSort stripedRows scrollable
-        scrollHeight="400px" :loading="store.loading" :virtualScrollerOptions="{ itemSize: 46 }">
+        :globalFilterFields="['name', 'course', 'studentId']" ref="dt" removableSort stripedRows scrollable
+        scrollHeight="400px" :loading="store.loading" :virtualScrollerOptions="{ itemSize: 46 }" >
         <template #header>
             <div class="flex justify-between">
                 <div class="flex gap-2">
@@ -61,10 +57,21 @@ onMounted(() => {
             </template>
         </Column>
         <Column field="studentId" header="Library ID"></Column>
-        <Column header="Name"></Column>
-        <Column header="Course/Year"></Column>
-        <Column header="Time In"></Column>
-        <Column header="Time Out"></Column>
-        <Column header="Date"></Column>
+        <Column field="name" header="Name"></Column>
+        <Column header="Course/Year">
+            <template #body="{ data }">
+                <div class="flex gap-1">
+                    <span>{{ data.course }}</span>
+                    <span v-if="data.year">{{ data.year }} year</span>
+                </div>
+            </template>
+        </Column>
+        <Column field="time_in" header="Time In"></Column>
+        <Column field="time_out" header="Time Out">
+            <template #body="{ data }">
+                <span>{{ data.time_out == 'unscanned' ? '05:00:00 PM' : data.time_out }}</span>
+            </template>
+        </Column>
+        <Column field="date" header="Date" sortable></Column>
     </DataTable>
 </template>
