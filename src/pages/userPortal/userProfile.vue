@@ -110,8 +110,7 @@ const getStudent = async ()=>{
               </div>
             </div>
             <div class=" flex flex-col items-center">
-                <img :src="student.image" class="mt-10 border-4 border-green-600 rounded-full" width="100px" height="100px" alt="" v-if="student.image">
-                <img src="/default.jpg" class="mt-10 border-4 border-green-600 rounded-full" width="100px" height="100px" alt="" v-else>
+                <img :src="student.image" class="mt-10 border-4 border-green-600 rounded-full" width="100px" height="100px" alt="">
                 <span class="mb-4 text-xl font-bold text-gray-900 dark:text-white">{{ student.name }}</span>
                 <span class="text-xl font-bold">{{ student.course }}</span><br>
             </div>

@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import authPage from '@/pages/index.vue'
+import { auth } from '@/stores/firebase';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,21 +24,25 @@ const router = createRouter({
       path: '/user-account',
       name: 'user-account',
       component: () => import('../pages/userPortal/account/userAccountForm.vue'),
+      meta: {requiresAuth: true},
     },
     {
       path: '/user-profile',
       name: 'user-profile',
       component: () => import('../pages/userPortal/userProfile.vue'),
+      meta: {requiresAuth: true},
     },
     {
       path: '/librarian',
       name: 'homepage',
       component: () => import('@/pages/librarian/index.vue'),
+      meta: {requiresAuth: true},
       children: [
         {
           path: '',
           name: 'dashboard',
           component: () => import('@/pages/librarian/Dashboard.vue'),
+
         },
         {
           path: '/students-list',
@@ -78,5 +83,20 @@ const router = createRouter({
     }
   ]
 })
+
+//Navigation guard
+router.beforeEach((to, from, next) => {
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const currentUser = auth.currentUser;
+
+  if (requiresAuth && !currentUser) {
+    next('/');
+  } else if (!requiresAuth && currentUser) {
+    next();
+  } else {
+    next();
+  }
+});
+
 
 export default router

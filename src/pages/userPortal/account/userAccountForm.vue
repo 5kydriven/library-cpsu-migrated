@@ -105,7 +105,10 @@ async function onSubmit(e) {
         await imageStore.upload('students_image/', file);
         const { imageUrl } = await imageStore.useFirebaseStorage('students_image/', file.name);
         studentData.value.image = imageUrl;
+
     } else{
+        const { imageUrl } = await imageStore.useFirebaseStorage('students_image/', 'default.jpg');
+        studentData.value.image = imageUrl;
         console.log("no file selected");
     }
 
@@ -129,7 +132,6 @@ async function onSubmit(e) {
         isLoading.value = false;
     }
 }
-
 </script>
 <template>
     <loader v-if="isLoading"/>
