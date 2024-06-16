@@ -1,5 +1,4 @@
 <script setup>
-import { ref } from 'vue';
 
 const props = defineProps({
     book: Object
@@ -7,27 +6,136 @@ const props = defineProps({
 
 </script>
 <template>
-    <div>{{ props.book.title }}</div>
-    <div>{{ props.book.isbn }}</div>
-    <div>{{ props.book.price }}</div>
-    <div>{{ props.book.notes }}</div>
-    <div>{{ props.book.accountNumber }}</div>
-    <div>{{ props.book.college }}</div>
-    <div>{{ props.book.bibliography }}</div>
-    <div>{{ props.book.copyright }}</div>
-    <div>{{ props.book.additionalTitle }}</div>
-    <div>{{ props.book.subArea }}</div>
-    <div>{{ props.book.author }}</div>
-    <div>{{ props.book.dealer }}</div>
-    <div>{{ props.book.price }}</div>
-    <div>{{ props.book.volume }}</div>
-    <div>{{ props.book.callNumber }}</div>
-    <div>{{ props.book.section }}</div>
-    <div>{{ props.book.additionalSubject }}</div>
-    <div>{{ props.book.publisher }}</div>
-    <div>{{ props.book.pubPlace }}</div>
-    <div>{{ props.book.totalPrice }}</div>
-    <div>{{ props.book.title }}</div>
-    <div>{{ props.book.remarks }}</div>
-    <div>{{ props.book.addedEntryTitle }}</div>
+    <div>
+        <span class="font-thin text-sm">Title: </span>
+        <span class="font-semibold">
+            {{ props.book.title }}
+        </span>
+    </div>
+    <div>
+        <span class="font-thin text-sm">ISBN: </span>
+        <span class="font-semibold">
+            {{ props.book.isbn }}
+        </span>
+    </div>
+    <div>
+        <span class="font-thin text-sm">Price: </span>
+        <span class="font-semibold">
+            {{ props.book.price }}
+        </span>
+    </div>
+    <div>
+        <span class="font-thin text-sm">Notes: </span>
+        <span class="font-semibold">
+            {{ props.book.notes }}
+        </span>
+    </div>
+    <div>
+        <span class="font-thin text-sm">Account Number: </span>
+        <span class="font-semibold">
+            {{ props.book.accountNumber }}
+        </span>
+    </div>
+    <div>
+        <span class="font-thin text-sm">College: </span>
+        <span class="font-semibold">
+            {{ props.book.college }}
+        </span>
+    </div>
+    <div>
+        <span class="font-thin text-sm">Bibliography: </span>
+        <span class="font-semibold">
+            {{ props.book.bibliography }}
+        </span>
+    </div>
+    <div>
+        <span class="font-thin text-sm">Copyright: </span>
+        <span class="font-semibold">
+            {{ props.book.copyright }}
+        </span>
+    </div>
+    <div>
+        <span class="font-thin text-sm">Additional Title: </span>
+        <span class="font-semibold">
+            {{ props.book.additionalTitle }}
+        </span>
+    </div>
+    <div>
+        <span class="font-thin text-sm">Sub Area: </span>
+        <span class="font-semibold">
+            {{ props.book.subArea }}
+        </span>
+    </div>
+    <div>
+        <span class="font-thin text-sm">Author: </span>
+        <span class="font-semibold">
+            {{ props.book.author }}
+        </span>
+    </div>
+    <div>
+        <span class="font-thin text-sm">Dealer: </span>
+        <span class="font-semibold">
+            {{ props.book.dealer }}
+        </span>
+    </div>
+    <div>
+        <span class="font-thin text-sm">Price: </span>
+        <span class="font-semibold">
+            {{ props.book.price }}
+        </span>
+    </div>
+    <div>
+        <span class="font-thin text-sm">Volume: </span>
+        <span class="font-semibold">
+            {{ props.book.volume }}
+        </span>
+    </div>
+    <div>
+        <span class="font-thin text-sm">Call Number: </span>
+        <span class="font-semibold">
+            {{ props.book.callNumber }}
+        </span>
+    </div>
+    <div>
+        <span class="font-thin text-sm">Section: </span>
+        <span class="font-semibold">
+            {{ props.book.section }}
+        </span>
+    </div>
+    <div>
+        <span class="font-thin text-sm">Additional Subject: </span>
+        <span class="font-semibold">
+            {{ props.book.additionalSubject }}
+        </span>
+    </div>
+    <div>
+        <span class="font-thin text-sm">Publisher: </span>
+        <span class="font-semibold">
+            {{ props.book.publisher }}
+        </span>
+    </div>
+    <div>
+        <span class="font-thin text-sm">Publication Place: </span>
+        <span class="font-semibold">
+            {{ props.book.pubPlace }}
+        </span>
+    </div>
+    <div>
+        <span class="font-thin text-sm">Total Price: </span>
+        <span class="font-semibold">
+            {{ props.book.totalPrice }}
+        </span>
+    </div>
+    <div>
+        <span class="font-thin text-sm">Remarks: </span>
+        <span class="font-semibold">
+            {{ props.book.remarks }}
+        </span>
+    </div>
+    <div>
+        <span class="font-thin text-sm">Added Entry Title: </span>
+        <span class="font-semibold">
+            {{ props.book.addedEntryTitle }}
+        </span>
+    </div>
 </template>
