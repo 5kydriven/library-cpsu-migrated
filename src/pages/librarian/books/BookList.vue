@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onBeforeMount } from 'vue';
 import { FilterMatchMode } from 'primevue/api';
 import ImportBooks from '@/components/booksComp/ImportBooks.vue';
 import { useToast } from 'primevue/usetoast';
@@ -76,69 +76,29 @@ const onFormSuccess = () => {
     toast.add({ severity: 'success', summary: 'Success', detail: 'Successfully Imported', life: 3000 });
 };
 
-const columns = ref([
-    { field: 'title', header: 'Title' },
-    { field: 'college', header: 'College' },
-    { field: 'callNumber', header: 'Call Number' },
-]);
 
-const optColumn = ref([
-    { field: 'title', header: 'Title' },
-    { field: 'college', header: 'College' },
-    { field: 'callNumber', header: 'Call Number' },
-    { field: 'accountNumber', header: 'Account Number' },
-    { field: 'addedEntryTitle', header: 'Added Entry Title' },
-    { field: 'additionalSubject', header: 'Additional Subject' },
-    { field: 'additionalTitle', header: 'Additional Title' },
-    { field: 'author', header: 'Author' },
-    { field: 'bibliography', header: 'Bibliography' },
-    { field: 'copyright', header: 'Copyright' },
-    { field: 'dealer', header: 'Dealer' },
-    { field: 'isbn', header: 'ISBN' },
-    { field: 'notes', header: 'Notes' },
-    { field: 'physDesc', header: 'Physical Description' },
-    { field: 'price', header: 'Price' },
-    { field: 'pubPlace', header: 'Publication Place' },
-    { field: 'publisher', header: 'Publisher' },
-    { field: 'remarks', header: 'Remarks' },
-    { field: 'section', header: 'Section' },
-    { field: 'subArea', header: 'Sub Area' },
-    { field: 'subject', header: 'Subject' },
-    { field: 'totalPrice', header: 'Total Price' },
-    { field: 'volume', header: 'volume' },
-])
 
-const selectedColumns = ref([]);
-const onToggle = (val) => {
-    selectedColumns.value = optColumn.value.filter(col => val.includes(col));
-};
-
-const fetchDefaultColumns = async () => {
-    // const defaultColumns = await store.fetchDefaultColumns();
-    if (columns.length > 0) {
-        selectedColumns.value = optColumn.value.filter(col => columns.includes(col.field));
-    } else {
-        selectedColumns.value = columns.value; // Fallback to default columns if none from DB
-    }
-};
-
-onMounted(() => {
+onBeforeMount(() => {
+    store.fetchColumns();
     store.fetchBooks()
-    fetchDefaultColumns()
 });
+
 </script>
 
 <template>
-    <div class="flex justify-between items-center">
-        <h1 class="text-2xl font-bold mb-4">Books List</h1>
-        <MultiSelect :modelValue="selectedColumns" :options="optColumn" optionLabel="header"
-            @update:modelValue="onToggle" display="chip" placeholder="Select Columns" />
+    <div class="flex justify-between items-center mb-4">
+        <h1 class="text-2xl font-bold">Books List</h1>
+        <MultiSelect :modelValue="store.selectedColumns" :loading="store.loading" :options="store.columns"
+            optionLabel="header" @update:modelValue="store.toggleColumnSelection" display="chip"
+            placeholder="Select Columns" maxSelectedLabels="5" />
     </div>
     <DataTable :value="store.books" tableStyle="min-width: 50rem" v-model:filters="filters" :loading="store.loading"
         :virtualScrollerOptions="{ itemSize: 46 }" :globalFilterFields="['title', 'college', 'callNumber']"
-        removableSort stripedRows dataKey="id" scrollable scrollHeight="400px" filterDisplay="menu" stateStorage="local"
-        stateKey="dt-state-demo-session">
+        removableSort stripedRows dataKey="id" scrollable scrollHeight="400px" filterDisplay="menu"
+        stateStorage="session" stateKey="dt-state-demo-session">
         <template #header>
+
+
             <div class="flex justify-between">
                 <div class="flex gap-2">
 
@@ -166,7 +126,7 @@ onMounted(() => {
             </template>
         </Column>
         <!-- <Column field="title" sortable header="Title"></Column> -->
-        <Column v-for="(col, index) of selectedColumns" :field="col.field" :header="col.header"
+        <Column v-for="(col, index) of store.selectedColumns" :field="col.field" :header="col.header"
             :key="col.field + '_' + index" sortable></Column>
         <!-- <Column header="borrowed"></Column> -->
         <Column header="Actions" class="text-center">
