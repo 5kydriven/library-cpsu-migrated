@@ -10,8 +10,8 @@ const isLogin = ref(true)
 
 const name = ref()
 const credentials = reactive({
-    email: "",
-    password: "",
+    email: "librarian@gmail.com",
+    password: "123456",
 });
 
 const loading = ref(false);

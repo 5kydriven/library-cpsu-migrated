@@ -17,12 +17,10 @@ const time = ref()
 
 //time update per second
 setInterval(async () => {
-    const { currentTime, currentTimeInSeconds } = dateStore.getCurrentTime()
+    const { currentTime, isAfter5Pm } = dateStore.getCurrentTime()
     time.value = currentTime
-    const sevenPMInSeconds = 19 * 3600;
-
-    // automatically update if time is 7 pm
-    if(currentTimeInSeconds > sevenPMInSeconds){
+    // automatically update if time is 5 pm
+    if(isAfter5Pm){
         const queryStudent = query(
             collection(db, 'students'),
             where('status', '==', 'IN'),
@@ -86,7 +84,10 @@ async function onScanSuccess(decodeResult){
     if(lastScanned.value != decodeResult){
             lastScanned.value = scannedQrCodes.value
             isLoading.value = true
-
+            const reset = () => {
+                        //    isStudent.value = false
+                           lastScanned.value = ''
+                        }
             try{
                 const docRef = doc(db, "students", scannedQrCodes.value);
                 const docSnap = await getDoc(docRef);
@@ -121,7 +122,7 @@ async function onScanSuccess(decodeResult){
                                     };
                                     
                                     await crud.updateDocument('studentLogs', log.id, updatedRecord)
-                                    
+                                    setInterval(reset(), 10000)
                                 });
                                 
                             } else{
@@ -145,11 +146,9 @@ async function onScanSuccess(decodeResult){
                                 
                                 //time in
                                 await crud.addDocument("studentLogs", record.value)
-                                 
+                                setInterval(reset(), 10000)
                              }
-                             scann//  setInterval(() => {
-                            //     isStudent.value = false
-                            //  }, 5000)edQrCodes.value = ''
+                    
                             
                         } catch(error){
                              console.error(error);

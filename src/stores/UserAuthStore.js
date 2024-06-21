@@ -11,7 +11,7 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 
 export const useAuthStore = defineStore("authStore", () => {
-  const user = ref({});
+  const user = ref(null);
   const router = useRouter();
   // const isLoading = ref(true);
 
