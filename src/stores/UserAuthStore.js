@@ -16,13 +16,16 @@ export const useAuthStore = defineStore("authStore", () => {
   // const isLoading = ref(true);
 
   const init = () => {
-    onAuthStateChanged(auth, (userDetails) => {
+    onAuthStateChanged(auth,async (userDetails) => {
       console.log(userDetails);
       if (userDetails) {
         const uid = userDetails.uid;
+        const docSnap = await getDoc(doc(db, "accountRoles", uid));
+        const role = docSnap.data().role;
         user.value = {
           email: userDetails.email,
           uid,
+          role
         };
         console.log(user)
         //   router.push( "/dashboard" );
@@ -33,6 +36,7 @@ export const useAuthStore = defineStore("authStore", () => {
       }
       // isLoading.value = true;
     });
+    
   };
 
   const isAuthenticated = () => {

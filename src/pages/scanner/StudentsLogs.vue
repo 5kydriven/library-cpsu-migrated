@@ -191,7 +191,8 @@ const play = () => {
 </script>
 <template>
     <!-- <loader v-if="isLoading"/> -->
-    <div class="flex items-center justify-around bg-[url('/background.jpg')]" style="height: 100vh" >
+    <div class="flex items-center justify-around" style="height: 100vh" >
+        <img src="/background.jpg" class="image-bg" >
         <audio ref="audioPlayer">
           <source src="/beep.mp3" type="audio/mpeg">
         </audio>
@@ -256,4 +257,9 @@ const play = () => {
   animation: l5 1s infinite;
 }
 @keyframes l5 {to{transform: rotate(.5turn)}}
+
+.image-bg{
+    position: absolute;
+    filter: blur(4px)
+}
 </style>

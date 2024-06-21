@@ -24,19 +24,19 @@ const router = createRouter({
       path: '/user-account',
       name: 'user-account',
       component: () => import('../pages/userPortal/account/userAccountForm.vue'),
-      meta: {requiresAuth: true, roles: ['librarian']},
+      meta: {requiresAuth: true},
     },
     {
       path: '/user-profile',
       name: 'user-profile',
       component: () => import('../pages/userPortal/userProfile.vue'),
-      meta: {requiresAuth: true, roles: ['librarian']},
+      meta: {requiresAuth: true},
     },
     {
       path: '/librarian',
       name: 'homepage',
       component: () => import('@/pages/librarian/index.vue'),
-      meta: {requiresAuth: true, roles: ['admin']},
+      meta: {requiresAuth: true},
       children: [
         {
           path: '',
@@ -85,14 +85,15 @@ const router = createRouter({
 })
 
 //Navigation guard
-router.beforeEach((to, from) => {
-  const currentUser = auth.currentUser;
-    // if the user is not logged in, redirect to the login page
-    if (!currentUser && to.meta.requiresAuth) {
-      return {
-        path: '/',
-      }
-    }
+router.beforeEach((to, from, next) => {
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const isAuthenticated = auth.currentUser;
+
+  if (requiresAuth && !isAuthenticated) {
+    next('/');
+  } else {
+    next();
+  }
 });
 
 

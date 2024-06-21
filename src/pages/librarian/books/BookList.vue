@@ -1,25 +1,25 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onBeforeMount } from 'vue';
 import { FilterMatchMode } from 'primevue/api';
 import ImportBooks from '@/components/booksComp/ImportBooks.vue';
 import { useToast } from 'primevue/usetoast';
-import { collection, onSnapshot } from "firebase/firestore";
-import { db } from '@/stores/firebase.js'
 import BookDetails from '@/components/booksComp/bookDetails.vue'
 import CirculateForm from '@/components/booksComp/circulateBook.vue'
+import { useAdminStore } from '@/stores/adminStore';
+
+const store = useAdminStore();
 
 const toast = useToast();
 
-const books = ref([]);
 const filters = ref();
 // const dt = ref();
 const dialogPosition = ref('center');
 const dialogVisible = ref(false);
 const op = ref();
-const loading = ref(false)
 const viewBook = ref(false)
 const circulate = ref(false)
 const selectedBook = ref(null); // New reactive variable to store selected book ID
+const selectedCustomer = ref();
 
 const initFilters = () => {
     filters.value = {
@@ -76,44 +76,47 @@ const onFormSuccess = () => {
     toast.add({ severity: 'success', summary: 'Success', detail: 'Successfully Imported', life: 3000 });
 };
 
-const loadLazyData = () => {
-    loading.value = true;
 
-    onSnapshot(collection(db, "books"), (querySnapshot) => {
-        const book = [];
-        querySnapshot.forEach((doc) => {
-            book.push({ id: doc.id, ...doc.data() });
-        });
-        books.value = book;
-        loading.value = false;
-    });
-}
 
-onMounted(() => {
-    loadLazyData();
+onBeforeMount(() => {
+    store.fetchColumns();
+    store.fetchBooks()
 });
+
 </script>
 
 <template>
-    <h1 class="text-2xl font-bold mb-4">Books List</h1>
-    <DataTable :value="books" tableStyle="min-width: 50rem" v-model:filters="filters" :loading="loading"
-        :virtualScrollerOptions="{ itemSize: 46 }" :globalFilterFields="['title', 'college', 'callNumber', 'borrowed']"
-        removableSort stripedRows dataKey="id" scrollable scrollHeight="400px" filterDisplay="menu">
+    <div class="flex justify-between items-center mb-4">
+        <h1 class="text-2xl font-bold">Books List</h1>
+        <MultiSelect :modelValue="store.selectedColumns" :loading="store.loading" :options="store.columns"
+            optionLabel="header" @update:modelValue="store.toggleColumnSelection" display="chip"
+            placeholder="Select Columns" maxSelectedLabels="5" />
+    </div>
+    <DataTable :value="store.books" tableStyle="min-width: 50rem" v-model:filters="filters" :loading="store.loading"
+        :virtualScrollerOptions="{ itemSize: 46 }" :globalFilterFields="['title', 'college', 'callNumber']"
+        removableSort stripedRows dataKey="id" scrollable scrollHeight="400px" filterDisplay="menu"
+        stateStorage="session" stateKey="dt-state-demo-session">
         <template #header>
+
+
             <div class="flex justify-between">
                 <div class="flex gap-2">
-                    <Button type="button" icon="pi pi-filter-slash" label="Clear" outlined @click="clearFilter()" />
+
                     <!-- <Button icon="pi pi-external-link" label="Export Displayed" @click="exportCSV()" /> -->
-                    <Button icon="pi pi-file-export" label="Export All" @click="exportAllCSV()" />
+                    <Button icon="pi pi-file-export" label="Export" @click="exportAllCSV()" />
                     <Button icon="pi pi-file-import" label="Import" @click="openDialog('top')" />
                     <Button icon="pi pi-book" label="Circulate Book" @click="circulate = true" />
                 </div>
 
-                <span class="relative">
-                    <i class="pi pi-search absolute top-2/4 -mt-2 left-3 text-surface-400 dark:text-surface-600" />
-                    <InputText v-model="filters['global'].value" placeholder="Keyword Search"
-                        class="pl-10 font-normal" />
-                </span>
+                <div class="flex gap-2">
+                    <span class="relative">
+                        <i class="pi pi-search absolute top-2/4 -mt-2 left-3 text-surface-400 dark:text-surface-600" />
+                        <InputText v-model="filters['global'].value" placeholder="Keyword Search"
+                            class="pl-10 font-normal" />
+                    </span>
+                    <Button type="button" icon="pi pi-filter-slash" label="Clear" outlined @click="clearFilter()" />
+                </div>
+
             </div>
         </template>
         <template #empty> No Books found. </template>
@@ -122,10 +125,10 @@ onMounted(() => {
                 {{ slotProps.index + 1 }}
             </template>
         </Column>
-        <Column field="title" sortable header="Title"></Column>
-        <Column field="college" header="College"></Column>
-        <Column field="callNumber" header="Call Number"></Column>
-        <Column header="borrowed"></Column>
+        <!-- <Column field="title" sortable header="Title"></Column> -->
+        <Column v-for="(col, index) of store.selectedColumns" :field="col.field" :header="col.header"
+            :key="col.field + '_' + index" sortable></Column>
+        <!-- <Column header="borrowed"></Column> -->
         <Column header="Actions" class="text-center">
             <template #body="{ data }">
                 <i class="pi pi-ellipsis-v cursor-pointer" @click="toggle(data)"></i>
