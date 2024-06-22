@@ -6,6 +6,7 @@ import { useToast } from 'primevue/usetoast';
 import BookDetails from '@/components/booksComp/bookDetails.vue'
 import CirculateForm from '@/components/booksComp/circulateBook.vue'
 import { useAdminStore } from '@/stores/adminStore';
+import EditForm from '@/components/booksComp/editForm.vue';
 
 const store = useAdminStore();
 
@@ -20,6 +21,7 @@ const viewBook = ref(false)
 const circulate = ref(false)
 const selectedBook = ref(null); // New reactive variable to store selected book ID
 const selectedCustomer = ref();
+const editDialog = ref(false)
 
 const initFilters = () => {
     filters.value = {
@@ -137,12 +139,13 @@ onBeforeMount(() => {
                         class="z-10 w-28 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
                         <ul class="py-1 text-sm text-gray-700 dark:text-gray-200">
                             <li>
-                                <a class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                                <a class="cursor-pointer block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                                     @click="viewBook = true">View more</a>
                             </li>
                             <li>
                                 <a
-                                    class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Edit</a>
+                                     @click="editDialog = true"
+                                    class="cursor-pointer block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Edit</a>
                             </li>
                         </ul>
                     </div>
@@ -162,6 +165,10 @@ onBeforeMount(() => {
 
     <Dialog v-model:visible="circulate" :draggable="false" modal header="Modal" :style="{ width: '25rem' }">
         <CirculateForm />
+    </Dialog>
+
+    <Dialog v-model:visible="editDialog" modal header="Edit Books" :style="{ width: '35rem' }" :draggable="false" >
+        <EditForm :book="selectedBook" />
     </Dialog>
 
     <Toast />
