@@ -29,6 +29,7 @@ const initFilters = () => {
         title: { value: null },
         college: { value: null },
         callNumber: { value: null },
+        isbn: { value: null },
     };
 };
 
@@ -78,7 +79,16 @@ const onFormSuccess = () => {
     toast.add({ severity: 'success', summary: 'Success', detail: 'Successfully Imported', life: 3000 });
 };
 
-
+const editResult = (res) => {
+    editDialog.value = false
+    if (res == 'successDelete') {
+        toast.add({ severity: 'success', summary: 'Success Message', detail: 'Successfully Deleted Book', life: 3000 });
+    } else if (res == 'successUpdate') {
+        toast.add({ severity: 'success', summary: 'Success Message', detail: 'Successfully Edited Book', life: 3000 });
+    } else {
+        toast.add({ severity: 'error', summary: 'Error Message', detail: 'Something went wrong!', life: 3000 });
+    }
+}
 
 onBeforeMount(() => {
     store.fetchColumns();
@@ -92,10 +102,10 @@ onBeforeMount(() => {
         <h1 class="text-2xl font-bold">Books List</h1>
         <MultiSelect :modelValue="store.selectedColumns" :loading="store.loading" :options="store.columns"
             optionLabel="header" @update:modelValue="store.toggleColumnSelection" display="chip"
-            placeholder="Select Columns" maxSelectedLabels="5" />
+            placeholder="Select Columns" />
     </div>
     <DataTable :value="store.books" tableStyle="min-width: 50rem" v-model:filters="filters" :loading="store.loading"
-        :virtualScrollerOptions="{ itemSize: 46 }" :globalFilterFields="['title', 'college', 'callNumber']"
+        :virtualScrollerOptions="{ itemSize: 46 }" :globalFilterFields="['title', 'college', 'callNumber', 'isbn']"
         removableSort stripedRows dataKey="id" scrollable scrollHeight="400px" filterDisplay="menu"
         stateStorage="session" stateKey="dt-state-demo-session">
         <template #header>
@@ -129,8 +139,14 @@ onBeforeMount(() => {
         </Column>
         <!-- <Column field="title" sortable header="Title"></Column> -->
         <Column v-for="(col, index) of store.selectedColumns" :field="col.field" :header="col.header"
-            :key="col.field + '_' + index" sortable></Column>
-        <!-- <Column header="borrowed"></Column> -->
+            :key="col.field + '_' + index" sortable>
+            <template #body="{data}" v-if="col.field == 'stocks'">
+                <Tag :value="data.stocks == '0' ? 'Not Available' : 'Available'"
+                    :severity="data.stocks == '0' ? 'danger' : null" />
+            </template>
+
+        </Column>
+
         <Column header="Actions" class="text-center">
             <template #body="{ data }">
                 <i class="pi pi-ellipsis-v cursor-pointer" @click="toggle(data)"></i>
@@ -143,8 +159,7 @@ onBeforeMount(() => {
                                     @click="viewBook = true">View more</a>
                             </li>
                             <li>
-                                <a
-                                     @click="editDialog = true"
+                                <a @click="editDialog = true"
                                     class="cursor-pointer block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Edit</a>
                             </li>
                         </ul>
@@ -167,8 +182,8 @@ onBeforeMount(() => {
         <CirculateForm />
     </Dialog>
 
-    <Dialog v-model:visible="editDialog" modal header="Edit Books" :style="{ width: '35rem' }" :draggable="false" >
-        <EditForm :book="selectedBook" />
+    <Dialog v-model:visible="editDialog" modal header="Edit Books" :style="{ width: '35rem' }" :draggable="false">
+        <EditForm :book="selectedBook" @result="editResult" />
     </Dialog>
 
     <Toast />

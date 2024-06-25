@@ -10,6 +10,7 @@ export const useAdminStore = defineStore('admin', () => {
     const loading = ref(false);
     const columns = ref([]);
     const selectedColumns = ref([]);
+    const bookLogs = ref([]);
 
     const fetchStudents = () => {
         loading.value = true;
@@ -28,7 +29,7 @@ export const useAdminStore = defineStore('admin', () => {
         onSnapshot(collection(db, "books"), (querySnapshot) => {
             const book = [];
             querySnapshot.forEach((doc) => {
-                book.push({ ...doc.data() });
+                book.push({ ...doc.data(), uid: doc.id });
             });
             books.value = book;
             loading.value = false;
@@ -46,6 +47,18 @@ export const useAdminStore = defineStore('admin', () => {
             loading.value = false;
         });
     };
+
+    const fetchBookLogs = () => {
+        loading.value = true;
+        onSnapshot(collection(db, "book-logs"), (querySnapshot) => {
+            const bookLog = [];
+            querySnapshot.forEach((doc) => {
+                bookLog.push({ ...doc.data() });
+            });
+            bookLogs.value = bookLog;
+            loading.value = false;
+        });
+    }
 
     const fetchColumns = () => {
         loading.value = true;
@@ -94,6 +107,8 @@ export const useAdminStore = defineStore('admin', () => {
         fetchColumns,
         columns,
         selectedColumns,
-        toggleColumnSelection
+        toggleColumnSelection,
+        fetchBookLogs,
+        bookLogs
     };
 });

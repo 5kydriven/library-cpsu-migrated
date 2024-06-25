@@ -1,4 +1,5 @@
 <script setup>
+import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { ref, onMounted } from 'vue';
 import { useAdminStore } from '@/stores/adminStore';
 
@@ -13,9 +14,10 @@ const initFilters = () => {
         name: { value: null },
         course: { value: null },
         studentId: { value: null },
+        date: { value: null  },
     };
+    console.log(filters.value.date)
 };
-
 initFilters();
 
 const clearFilter = () => {
@@ -31,10 +33,10 @@ onMounted(() => {
 });
 </script>
 <template>
-    <h1 class="text-2xl font-bold mb-4">Student Logs</h1>
+    <h1 class="text-2xl font-bold mb-4">Student Time Records</h1>
     <DataTable :value="store.logs" tableStyle="min-width: 50rem" v-model:filters="filters"
         :globalFilterFields="['name', 'course', 'studentId']" ref="dt" removableSort stripedRows scrollable
-        scrollHeight="400px" :loading="store.loading" :virtualScrollerOptions="{ itemSize: 46 }" >
+        scrollHeight="400px" :loading="store.loading" :virtualScrollerOptions="{ itemSize: 46 }" filterDisplay="menu">
         <template #header>
             <div class="flex justify-between">
                 <div class="flex gap-2">
@@ -72,6 +74,14 @@ onMounted(() => {
                 <span>{{ data.time_out == 'unscanned' ? '05:00:00 PM' : data.time_out }}</span>
             </template>
         </Column>
-        <Column field="date" header="Date" sortable></Column>
+        <Column field="date" header="Date" sortable :showFilterMatchModes="false">
+            <template #body="{ data }">
+                {{ data.date }}
+            </template>
+            <template #filter="{ filterModel }">
+                <Calendar v-model="filterModel.value" dateFormat="mm/dd/yy" selectionMode="range" :manualInput="false"
+                    placeholder="mm/dd/yyyy" />
+            </template>
+        </Column>
     </DataTable>
 </template>
