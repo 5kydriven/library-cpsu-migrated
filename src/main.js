@@ -39,6 +39,7 @@ import Carousel from 'primevue/carousel';
 import FileUpload from 'primevue/fileupload';
 import Chart from 'primevue/chart';
 import AutoComplete from 'primevue/autocomplete';
+import Avatar from 'primevue/avatar';
 
 
 const app = createApp(App)
@@ -70,6 +71,7 @@ app.component('Carousel', Carousel)
 app.component('FileUpload', FileUpload)
 app.component('Chart', Chart)
 app.component('AutoComplete', AutoComplete)
+app.component('Avatar', Avatar)
 
 app.use(PrimeVue, {
     unstyled: true,

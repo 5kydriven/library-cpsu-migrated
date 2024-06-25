@@ -54,26 +54,16 @@ const router = createRouter({
           name: 'books-list',
           component: () => import('@/pages/librarian/books/BookList.vue'),
         },
-        // {
-        //   path: '/books-location',
-        //   name: 'books-location',
-        //   component: () => import('@/pages/librarian/books/BookLocation.vue'),
-        // },
         {
           path: '/student-logs',
           name: 'student-logs',
           component: () => import('@/pages/librarian/UserLogs.vue'),
         },
         {
-          path: '/return-books',
-          name: 'return-books',
-          component: () => import('@/pages/librarian/transactions/ReturnedBooks.vue'),
-        },
-        {
-          path: '/borrow-books',
-          name: 'borrow-books',
-          component: () => import('@/pages/librarian/transactions/BorrowedBooks.vue'),
-        },
+          path: '/book-logs',
+          name: 'book-logs',
+          component: () => import('@/pages/librarian/transactions/BookLogs.vue'),
+        }
       ],
     },
     {

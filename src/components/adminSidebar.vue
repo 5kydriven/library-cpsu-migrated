@@ -4,37 +4,20 @@ import { RouterLink } from "vue-router";
 
 const transactions = ref([
     {
-        label: 'Transactions',
-        icon: 'sync_alt',
+        label: 'Logs',
+        icon: 'list_alt',
         items: [
             {
-                label: 'Borrowed Books',
-                route: '/borrow-books'
+                label: "Library Logs",
+                route: '/book-logs'
             },
             {
-                label: 'Returned Books',
-                route: '/return-books'
+                label: "Time Log",
+                route: '/student-logs'
             }
         ]
     }
 ]);
-
-// const books = ref([
-//     {
-//         label: 'Books',
-//         icon: 'library_books',
-//         items: [
-//             {
-//                 label: 'Book List',
-//                 route: '/books-list'
-//             },
-//             {
-//                 label: 'Books Location',
-//                 route: '/books-location'
-//             }
-//         ]
-//     }
-// ]);
 </script>
 
 <template>
@@ -69,26 +52,8 @@ const transactions = ref([
                         </span>
                         <span class="flex-1 ms-3 whitespace-nowrap">Books</span>
                     </RouterLink>
-                    <!-- <PanelMenu :model="books">
-                        <template #item="{ item }">
-                            <router-link v-if="item.route" v-slot="{ href, navigate }" :to="item.route" custom>
-                                <a class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-                                    :href="href" @click="navigate">
-                                    <span :class="item.icon" />
-                                    <span class="ml-2 text-color">{{ item.label }}</span>
-                                </a>
-                            </router-link>
-                            <a v-else
-                                class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-                                :href="item.url" :target="item.target">
-                                <span class="material-icons">{{ item.icon }}</span>
-                                <span class="ml-2">{{ item.label }}</span>
-                                <span v-if="item.items" class="pi pi-angle-down text-primary ml-auto" />
-                            </a>
-                        </template>
-</PanelMenu> -->
                 </li>
-                <li>
+                <!-- <li>
                     <RouterLink to="/student-logs"
                         class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                         <span class="material-icons-outlined">
@@ -96,7 +61,7 @@ const transactions = ref([
                         </span>
                         <span class="flex-1 ms-3 whitespace-nowrap">Log's</span>
                     </RouterLink>
-                </li>
+                </li> -->
                 <li>
                     <PanelMenu :model="transactions">
                         <template #item="{ item }">

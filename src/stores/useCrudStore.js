@@ -1,8 +1,10 @@
 import { defineStore } from "pinia";
 import { query, doc, collection, addDoc, setDoc, updateDoc, deleteDoc, getDocs } from "firebase/firestore";
 import { db } from "./firebase";
+import { ref } from "vue";
 
 export const useCrud = defineStore('crud', () => {
+
     const addDocument = async (collectionPath, documentData) => {
         try {
             await addDoc(collection(db, collectionPath), documentData);
@@ -45,7 +47,7 @@ export const useCrud = defineStore('crud', () => {
             const querySnapshot = await getDocs(query(collectionRef));
 
             querySnapshot.forEach(async (doc) => {
-              await deleteDoc(doc.ref);
+                await deleteDoc(doc.ref);
             });
             console.log("All documents deleted successfully");
         } catch (error) {
@@ -58,6 +60,6 @@ export const useCrud = defineStore('crud', () => {
         setDocument,
         updateDocument,
         deleteDocument,
-        deleteAllDocuments
+        deleteAllDocuments,
     };
 });
