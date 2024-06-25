@@ -12,10 +12,10 @@
     <div>
         <div>
             <DataTable :value="files" tableStyle="min-width: 20rem" v-show="files" removableSort paginator :rows="5">
-                <Column field="sec" header="Section" sortable></Column>
+                <Column field="stocks" header="Stocks"></Column>
                 <Column field="college" header="College"></Column>
                 <Column field="title" header="Title"></Column>
-                <Column field="price" header="Price"></Column>
+                <Column field="author" header="Author"></Column>
                 <template #footer> In total there are {{ files ? files.length : 0 }} Book's </template>
             </DataTable>
         </div>
@@ -129,6 +129,7 @@ const uploadFile = async () => {
             pubPlace: fileData.pubplace || "N/A",
             addedEntryTitle: fileData["AddedEntryTitle / Series Title"] || "N/A",
             remarks: fileData.remarks || "N/A",
+            stocks: fileData.stocks || "N/A",
         };
 
         batch.set(newDocRef, cleanedData);
