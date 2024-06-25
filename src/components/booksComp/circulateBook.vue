@@ -1,66 +1,61 @@
 <script setup>
-import { ref, onMounted } from "vue";
-import { CountryService } from "@/service/CountryService";
+import { ref, onMounted, computed } from "vue";
+import { useAdminStore } from '@/stores/adminStore.js';
 
-// const selectedCountry = ref();
-const countries = ref();
-const countrie = ref();
-const selectedCountry = ref();
-const selected = ref();
-const filteredCountries = ref();
+const store = useAdminStore();
+
+const selectedBook = ref();
+const selectedName = ref();
+const studentNames = ref();
+const bookNames = computed(() => store.books.map(book => ({
+    title: book.title,
+    id: book.uid
+})));
 
 const search = (event) => {
     if (!event.query.trim().length) {
-        filteredCountries.value = [...countries.value];
+        studentNames.value = store.students;
     } else {
-        filteredCountries.value = countries.value.filter((country) => {
-            return country.name.toLowerCase().startsWith(event.query.toLowerCase());
+        const filterData = store.students.map(student => ({
+            name: student.name,
+            uid: student.uid,
+            image: student.image
+        }))
+        studentNames.value = filterData.filter((student) => {
+            return student.name.toLowerCase().startsWith(event.query.toLowerCase());
         });
     }
 }
 
-
-// const countries = ref([
-//     { name: 'Australia', code: 'AU' },
-//     { name: 'Brazil', code: 'BR' },
-//     { name: 'China', code: 'CN' },
-//     { name: 'Egypt', code: 'EG' },
-//     { name: 'France', code: 'FR' },
-//     { name: 'Germany', code: 'DE' },
-//     { name: 'India', code: 'IN' },
-//     { name: 'Japan', code: 'JP' },
-//     { name: 'Spain', code: 'ES' },
-//     { name: 'United States', code: 'US' }
-// ]);
-
 onMounted(() => {
-    CountryService.getCountries().then((data) => (countries.value = data));
-    CountryService.getCountries().then((data) => (countrie.value = data));
+    store.fetchStudents()
+    store.fetchBooks()
 });
 </script>
 
 <template>
     <div class="mb-4">
         <label class="block mb-2 text-sm font-medium text-gray-900">Student Name</label>
-        <AutoComplete v-model="selectedCountry" optionLabel="name" :suggestions="filteredCountries" @complete="search"
+        <AutoComplete v-model="selectedName" optionLabel="name" :suggestions="studentNames" @complete="search"
             inputClass="w-full" :pt="{
                 root: {
                     class: 'w-full'
                 }
             }">
             <template #option="slotProps">
-                <div class="flex align-options-center">
+                <div class="flex items-center gap-2">
+                    <Avatar :image="slotProps.option.image" shape="circle" />
                     <div>{{ slotProps.option.name }}</div>
                 </div>
             </template>
         </AutoComplete>
     </div>
     <div class="mb-4">
-        <Dropdown v-model="selected" :options="countrie" filter optionLabel="name" placeholder="Select a book"
+        <Dropdown v-model="selectedBook" :options="bookNames" filter optionLabel="title" placeholder="Select a book"
             class="w-full">
             <template #value="slotProps">
-                <div v-if="slotProps.value" class="flex items-center">    
-                    <div>{{ slotProps.value.name }}</div>
+                <div v-if="slotProps.value" class="flex items-center">
+                    <div>{{ slotProps.value.title }}</div>
                 </div>
                 <span v-else>
                     {{ slotProps.placeholder }}
@@ -68,13 +63,13 @@ onMounted(() => {
             </template>
             <template #option="slotProps">
                 <div class="flex items-center">
-                    <div>{{ slotProps.option.name }}</div>
+                    <div>{{ slotProps.option.title }}</div>
                 </div>
             </template>
         </Dropdown>
     </div>
     <div class="flex justify-end gap-2">
-        <Button type="button" label="Borrow Book" severity="secondary"></Button>
-        <Button type="button" label="Return Book" severity="secondary"></Button>
+        <Button type="button" label="Borrow Book" severity="secondary" ></Button>
+        <Button type="button" label="Return Book" severity="secondary" ></Button>
     </div>
 </template>
