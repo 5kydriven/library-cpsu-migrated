@@ -14,30 +14,25 @@ const chartData = ref();
 const chartOptions = ref();
 
 const setChartData = () => {
-    const documentStyle = getComputedStyle(document.body);
-
     return {
-        labels: ['A', 'B', 'C'],
+        labels: ['BSIT','BSHM','BSCRIM','BSED'],
         datasets: [
             {
-                data: [540, 325, 702],
-                backgroundColor: [documentStyle.getPropertyValue('--primary-500'), documentStyle.getPropertyValue('--orange-500'), documentStyle.getPropertyValue('--gray-500')],
-                hoverBackgroundColor: [documentStyle.getPropertyValue('--primary-400'), documentStyle.getPropertyValue('--orange-400'), documentStyle.getPropertyValue('--gray-400')]
+                data: [540, 325, 702,10],
+                backgroundColor: ['#10b981', '#06b6d4', '#6366f1','#f43f5e'],
+                hoverBackgroundColor: ['#34d399', '#22d3ee', '#818cf8','#fb7185']
             }
         ]
     };
 };
 
 const setChartOptions = () => {
-    const documentStyle = getComputedStyle(document.documentElement);
-    const textColor = documentStyle.getPropertyValue('--text-color');
-
     return {
         plugins: {
             legend: {
                 labels: {
                     usePointStyle: true,
-                    color: textColor
+                    color: '#111827'
                 }
             }
         }

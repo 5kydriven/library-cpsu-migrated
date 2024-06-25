@@ -14,52 +14,46 @@ const chartData = ref();
 const chartOptions = ref();
 
 const setChartData = () => {
-    const documentStyle = getComputedStyle(document.documentElement);
 
     return {
-        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
         datasets: [
             {
-                label: 'First Dataset',
+                label: 'Overview Student Logs',
                 data: [65, 59, 80, 81, 56, 55, 40],
                 fill: false,
-                borderColor: documentStyle.getPropertyValue('--cyan-500'),
+                borderColor: '#10b981',
                 tension: 0.4
             }
         ]
     };
 };
 const setChartOptions = () => {
-    const documentStyle = getComputedStyle(document.documentElement);
-    const textColor = documentStyle.getPropertyValue('--text-color');
-    const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
-    const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
-
     return {
         maintainAspectRatio: false,
         aspectRatio: 0.6,
         plugins: {
             legend: {
                 labels: {
-                    color: textColor
+                    color: '#020617'
                 }
             }
         },
         scales: {
             x: {
                 ticks: {
-                    color: textColorSecondary
+                    color: '#1f2937'
                 },
                 grid: {
-                    color: surfaceBorder
+                    color: '#cbd5e1'
                 }
             },
             y: {
                 ticks: {
-                    color: textColorSecondary
+                    color: '#1f2937'
                 },
                 grid: {
-                    color: surfaceBorder
+                    color: '#cbd5e1'
                 }
             }
         }
