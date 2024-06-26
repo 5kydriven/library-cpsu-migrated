@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { doc, onSnapshot, updateDoc, collection } from "firebase/firestore";
+import { doc, onSnapshot, updateDoc, collection, where, query } from "firebase/firestore";
 import { ref, computed } from 'vue';
 import { db } from './firebase';
 
@@ -38,7 +38,8 @@ export const useAdminStore = defineStore('admin', () => {
 
     const fetchLogs = () => {
         loading.value = true;
-        onSnapshot(collection(db, "studentLogs"), (querySnapshot) => {
+        const q = query(collection(db, "studentLogs"), where("time_in", "==", "asc"));
+        onSnapshot(q, (querySnapshot) => {
             const log = [];
             querySnapshot.forEach((doc) => {
                 log.push({ ...doc.data() });
@@ -46,6 +47,7 @@ export const useAdminStore = defineStore('admin', () => {
             logs.value = log;
             loading.value = false;
         });
+        console.log(logs.value)
     };
 
     const fetchBookLogs = () => {

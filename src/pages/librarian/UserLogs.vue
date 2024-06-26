@@ -16,7 +16,6 @@ const initFilters = () => {
         studentId: { value: null },
         date: { value: null  },
     };
-    console.log(filters.value.date)
 };
 initFilters();
 
