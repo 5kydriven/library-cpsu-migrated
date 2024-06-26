@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
 import { getStorage } from 'firebase/storage'
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -22,5 +22,13 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 const storage = getStorage(app)
+// Set auth persistence
+setPersistence(auth, browserLocalPersistence)
+  .then(() => {
+    console.log('Auth persistence set to LOCAL');
+  })
+  .catch((error) => {
+    console.error('Error setting persistence:', error);
+  });
 
 export { db, auth, storage }

@@ -6,6 +6,7 @@ import { Html5Qrcode } from 'html5-qrcode';
 import { doc, collection, getDocs, getDoc, updateDoc, setDoc, addDoc, query, where } from 'firebase/firestore';
 import { db } from '@/stores/firebase';
 import { useToast } from "primevue/usetoast";
+import { formatDate } from '@/composables/dateFormat';
 
 const toast = useToast();
 const isLoading = ref(false)
@@ -13,6 +14,7 @@ const dateStore = useTimeAndDate()
 const crud = useCrud()
 
 const { currentDate } = dateStore.getCurrentDate()
+const {dateFormat} = formatDate()
 const time = ref()
 
 //time update per second
@@ -127,7 +129,7 @@ async function onScanSuccess(decodeResult) {
         isLoading.value = false;
         student.value = docSnap.data();
         isStudent.value = true;
-
+        
         if (student.value.status === 'IN') {
             isIN.value = false;
             message.value = "GOODBYE!!!";
@@ -160,8 +162,8 @@ async function onScanSuccess(decodeResult) {
                 name: student.value.name,
                 course: student.value.course,
                 year: student.value.year,
-                date: currentDate.value,
-                studentId: student.value.student_id,
+                date: dateFormat.value,
+                studentId: scannedQrCodes.value,
                 time_in: time.value,
                 time_out: '',
                 status: 'IN',
@@ -210,6 +212,7 @@ const play = () => {
                 </div>
                 {{ currentDate }}
                 {{time}}<br>
+                {{ dateFormat }}
                 <!-- <button @click="crud.deleteAllDocuments('studentLogs')"> Delete all</button> -->
             </div>
             <div class=" bg-white rounded-lg h-6/12 w-5/12 drop-shadow-sm"> 
