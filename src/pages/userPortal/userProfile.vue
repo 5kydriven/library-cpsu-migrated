@@ -116,7 +116,7 @@ const getStudent = async ()=>{
             </div>
             <div class="flex flex-col items-center gap-10 bg-gradient-to-l from-green-600 to-green-500 rounded-t-lg rounded-tr-full rounded-tl-full h-96">
                 <div class="p-5 bg-white border-4 border-gray-950">
-                  <qrCode :id="student.id"/>
+                  <qrCode :id="student.student_id"/>
                 </div>
                 <div class="flex justify-center items-center gap-3 ">
                     <img src="/logo.png" width="50" alt="">
