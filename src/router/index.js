@@ -37,7 +37,7 @@ const router = createRouter({
       path: '/librarian',
       name: 'homepage',
       component: () => import('@/pages/librarian/index.vue'),
-      meta: { requiresAuth: true, requiresLibrarian: true },
+      // meta: { requiresAuth: true, requiresLibrarian: true },
       children: [
         {
           path: '',

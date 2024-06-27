@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { doc, onSnapshot, updateDoc, collection, where, query } from "firebase/firestore";
+import { doc, onSnapshot, updateDoc, collection, where, query, orderBy, serverTimestamp, getDoc, addDoc, setDoc } from "firebase/firestore";
 import { ref, computed } from 'vue';
 import { db } from './firebase';
 
@@ -38,7 +38,7 @@ export const useAdminStore = defineStore('admin', () => {
 
     const fetchLogs = () => {
         loading.value = true;
-        const q = query(collection(db, "studentLogs"), where("time_in", "==", "asc"));
+        const q = query(collection(db, "studentLogs"), orderBy("time_in", "desc"));
         onSnapshot(q, (querySnapshot) => {
             const log = [];
             querySnapshot.forEach((doc) => {
@@ -47,7 +47,24 @@ export const useAdminStore = defineStore('admin', () => {
             logs.value = log;
             loading.value = false;
         });
-        console.log(logs.value)
+    };
+
+    const fetchLogsByDateRange = (startDate, endDate) => {
+        loading.value = true;
+        const q = query(
+            collection(db, "studentLogs"),
+            where("time_in", ">=", new Date(startDate)),
+            where("time_in", "<=", new Date(endDate)),
+            orderBy("time_in", "desc")
+        );
+        onSnapshot(q, (querySnapshot) => {
+            const log = [];
+            querySnapshot.forEach((doc) => {
+                log.push({ ...doc.data() });
+            });
+            logs.value = log;
+            loading.value = false;
+        });
     };
 
     const fetchBookLogs = () => {
@@ -58,14 +75,14 @@ export const useAdminStore = defineStore('admin', () => {
                 bookLog.push({ ...doc.data() });
             });
             bookLogs.value = bookLog;
-            loading.value = false;
         });
+        loading.value = false;
     }
 
     const fetchColumns = () => {
         loading.value = true;
 
-        const columnsDocRef = doc(db, "columns", "Folax89B5AHlTCa1U84L"); 
+        const columnsDocRef = doc(db, "columns", "Folax89B5AHlTCa1U84L");
         onSnapshot(columnsDocRef, (doc) => {
             if (doc.exists()) {
                 columns.value = doc.data().column.map(column => ({
@@ -96,6 +113,74 @@ export const useAdminStore = defineStore('admin', () => {
     const totalStudents = computed(() => students.value.length);
     const totalBooks = computed(() => books.value.length);
 
+    const borrowBook = async (student, book) => {
+        loading.value = true;
+        try {
+            const bookRef = doc(db, "books", book.id);
+            const bookDoc = await getDoc(bookRef);
+
+            if (!bookDoc.exists()) {
+                throw new Error("Book does not exist");
+            }
+
+            const currentStocks = bookDoc.data().stocks;
+            if (currentStocks <= 0) {
+                throw new Error("No stocks available");
+            }
+
+            await updateDoc(bookRef, {
+                stocks: currentStocks - 1
+            });
+
+            const logRef = await addDoc(collection(db, "book-logs"), {
+                borrower: student.name,
+                student_id: student.uid,
+                year: student.year,
+                course: student.course,
+                bookName: book.title,
+                book_id: book.id,
+                isReturned: false,
+                dateBorrowed: serverTimestamp(),
+                dateReturned: null
+            });
+
+            await updateDoc(doc(db, "students", student.uid), {
+                borrowBook: logRef.id
+            })
+
+            console.log("success");
+        } catch (error) {
+            console.error("Error borrowing book:", error);
+        }
+
+        loading.value = false;
+    };
+
+    const returnBook = async (student) => {
+        loading.value = true;
+        const studentDoc = await getDoc(doc(db, "students", student.uid));
+        const bookDoc = await getDoc(doc(db, "book-logs", studentDoc.data().borrowBook));
+        const bookData = await getDoc(doc(db, "books", bookDoc.data().book_id));
+
+        console.log(studentDoc.data().borrowBook)
+        await updateDoc(doc(db, "book-logs", studentDoc.data().borrowBook), {
+            isReturned: true,
+            dateReturned: serverTimestamp()
+        });
+
+        await updateDoc(doc(db, "students", student.uid), {
+            borrowBook: ''
+        });
+
+        await updateDoc(doc(db, "books", bookDoc.data().book_id), {
+            stocks: bookData.data().stocks + 1
+        });
+
+        loading.value = false;
+
+        console.log('Success')
+    }
+
     return {
         students,
         loading,
@@ -104,6 +189,7 @@ export const useAdminStore = defineStore('admin', () => {
         fetchBooks,
         logs,
         fetchLogs,
+        fetchLogsByDateRange,
         totalStudents,
         totalBooks,
         fetchColumns,
@@ -111,6 +197,8 @@ export const useAdminStore = defineStore('admin', () => {
         selectedColumns,
         toggleColumnSelection,
         fetchBookLogs,
-        bookLogs
+        bookLogs,
+        borrowBook,
+        returnBook
     };
 });

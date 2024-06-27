@@ -4,6 +4,8 @@ import { useAdminStore } from '@/stores/adminStore.js';
 
 const store = useAdminStore();
 
+const emit = defineEmits(['result']);
+
 const selectedBook = ref();
 const selectedName = ref();
 const studentNames = ref();
@@ -18,13 +20,38 @@ const search = (event) => {
     } else {
         const filterData = store.students.map(student => ({
             name: student.name,
-            uid: student.uid,
-            image: student.image
+            uid: student.id,
+            image: student.image,
+            year: student.year,
+            course: student.course,
+            bookId: student.borrowBook
         }))
         studentNames.value = filterData.filter((student) => {
             return student.name.toLowerCase().startsWith(event.query.toLowerCase());
         });
     }
+}
+
+const borrow = async () => {
+    try {
+        await store.borrowBook(selectedName.value, selectedBook.value)
+        emit('result', 'success')
+    } catch(error) {
+        emit('result', 'error')
+        console.log(error)
+    }
+
+}
+
+const returned = async () => {
+    try {
+        await store.returnBook(selectedName.value)
+        emit('result', 'success')
+    } catch (error) {
+        emit('result', 'error')
+        console.log(error)
+    }
+
 }
 
 onMounted(() => {
@@ -69,7 +96,9 @@ onMounted(() => {
         </Dropdown>
     </div>
     <div class="flex justify-end gap-2">
-        <Button type="button" label="Borrow Book" severity="secondary" ></Button>
-        <Button type="button" label="Return Book" severity="secondary" ></Button>
+        <Button type="button" label="Borrow Book" severity="secondary" @click="borrow"
+            :loading="store.loading"></Button>
+        <Button type="button" label="Return Book" severity="secondary" @click="returned"
+            :loading="store.loading"></Button>
     </div>
 </template>

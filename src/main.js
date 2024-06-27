@@ -42,6 +42,7 @@ import AutoComplete from 'primevue/autocomplete';
 import Avatar from 'primevue/avatar';
 
 
+
 const app = createApp(App)
 
 app.component('InputMask', InputMask)

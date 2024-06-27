@@ -1,8 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { ProductService } from '@/service/productService.js';
+import { useAdminStore } from '@/stores/adminStore';
 
-const products = ref();
+
+const store = useAdminStore();
+
 const filters = ref();
 const dt = ref();
 
@@ -26,15 +28,34 @@ const exportCSV = () => {
     dt.value.exportCSV();
 };
 
+function formatTimestamp(timestamp) {
+    const seconds = timestamp.seconds;
+    const nanoseconds = timestamp.nanoseconds;
+
+    // Convert seconds to milliseconds
+    const milliseconds = seconds * 1000 + nanoseconds / 1000000;
+
+    // Create a new Date object
+    const date = new Date(milliseconds);
+
+    // Extract date components
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const year = date.getFullYear();
+
+    // Format as mm/dd/yyyy
+    return `${month}/${day}/${year}`;
+}
+
 onMounted(() => {
-    ProductService.getProducts().then((data) => (products.value = data));
+    store.fetchBookLogs()
 });
 </script>
 <template>
     <h1 class="text-2xl font-bold mb-4">Borrow & Return books</h1>
-    <DataTable :value="products" tableStyle="min-width: 50rem" v-model:filters="filters"
+    <DataTable :value="store.bookLogs" tableStyle="min-width: 50rem" v-model:filters="filters"
         :globalFilterFields="['name', 'quantity', 'code', 'category']" ref="dt" removableSort showGridlines stripedRows
-        scrollable scrollHeight="400px">
+        scrollable scrollHeight="400px" :loading="store.loading" :virtualScrollerOptions="{ itemSize: 46 }">
         <template #header>
             <div class="flex justify-between">
                 <div class="flex gap-2">
@@ -51,9 +72,31 @@ onMounted(() => {
             </div>
         </template>
         <template #empty> No customers found. </template>
-        <Column field="code" header="Code"></Column>
-        <Column field="name" sortable header="Name"></Column>
-        <Column field="category" header="Category"></Column>
-        <Column field="quantity" header="Quantity"></Column>
+        <Column field="student_id" header="Student ID"></Column>
+        <Column field="borrower" header="Name"></Column>
+        <Column header="Course/Year">
+            <template #body="{ data }">
+                <div class="flex gap-1">
+                    <span>{{ data.course }}</span>
+                    <span v-if="data.year">{{ data.year }} year</span>
+                </div>
+            </template>
+        </Column>
+        <Column header="Borrowed Date">
+            <template #body="{data}">
+                {{ formatTimestamp(data.dateBorrowed) }}
+            </template>
+        </Column>
+        <Column header="Returned Date">
+            <template #body="{ data }">
+                {{ formatTimestamp(data.dateReturned) }}
+            </template>
+        </Column>
+        <Column header="Status">
+            <template #body="{ data }">
+                <Tag :value="data.isReturned ? 'returned' : 'borrowed'"
+                    :severity="!data.isReturned ? 'danger' : null" />
+            </template>
+        </Column>
     </DataTable>
 </template>
