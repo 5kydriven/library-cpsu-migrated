@@ -6,6 +6,8 @@ import 'primeicons/primeicons.css';
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import { firebaseApp } from './stores/firebase';
+import { VueFire, VueFireAuth } from 'vuefire'
 
 import App from './App.vue'
 import router from './router'
@@ -82,5 +84,14 @@ app.use(PrimeVue, {
 app.use(ToastService);
 app.use(createPinia())
 app.use(router)
+
+app.use(VueFire, {
+    firebaseApp: firebaseApp,
+    modules: [
+        // ... other modules
+        VueFireAuth(),
+    ],
+})
+
 
 app.mount('#app')

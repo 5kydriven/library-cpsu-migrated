@@ -3,14 +3,13 @@ import { RouterView } from 'vue-router'
 import { useAuthStore } from './stores/UserAuthStore';
 import { onBeforeMount } from 'vue';
 
-const store = useAuthStore()
+const authStore = useAuthStore()
 
 onBeforeMount(() => {
-  store.init()
+  authStore.handleAuthState()
 })
 </script>
 
 <template>
   <RouterView />
 </template>
-

@@ -15,7 +15,7 @@ export const useAuthStore = defineStore("authStore", () => {
   const router = useRouter();
   // const isLoading = ref(true);
 
-  const init = () => {
+  const handleAuthState = () => {
     onAuthStateChanged(auth, async (userDetails) => {
       if (userDetails) {
         const uid = userDetails.uid;
@@ -134,7 +134,7 @@ export const useAuthStore = defineStore("authStore", () => {
     createUser,
     loginUser,
     logoutUser,
-    init,
+    handleAuthState,
     user,
     // isLoading,
     isAuthenticated

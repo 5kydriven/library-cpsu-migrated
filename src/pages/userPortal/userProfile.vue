@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref } from 'vue';
-import { RouterLink } from 'vue-router';
+import { RouterLink, useRouter } from 'vue-router';
 import { onAuthStateChanged } from 'firebase/auth';
 import { query, collection, where, getDocs } from 'firebase/firestore';
 import { db, auth } from '@/stores/firebase';
@@ -9,6 +9,7 @@ import qrCode from "@/components/studentComp/qrCode.vue"
 import { useToast } from "primevue/usetoast";
 import loader from '@/components/loader.vue';
 
+const router = useRouter()
 const isLoading = ref(false)
 const store = useAuthStore()
 const toast = useToast();
@@ -50,10 +51,15 @@ const getStudent = async ()=>{
 
     try {
         const querySnapshot = await getDocs(queryStudent);
+        if(!querySnapshot.empty){
+
             querySnapshot.forEach((doc) => {
               student.value = {...student.value, ...doc.data()}
               console.log(doc.data());
-        });
+            });
+        } else{
+            router.push('/user-account')
+        }
         isLoading.value = false
     } catch (error) {
         console.error('Error getting documents: ', error);
@@ -110,7 +116,7 @@ const getStudent = async ()=>{
               </div>
             </div>
             <div class=" flex flex-col items-center">
-                <img :src="student.image" class="mt-10 border-4 border-green-600 rounded-full" width="100px" height="100px" alt="">
+                <img :src="student.image" class="mt-10 border-4 border-green-600 rounded-full h-24 w-24"  alt="">
                 <span class="mb-4 text-xl font-bold text-gray-900 dark:text-white">{{ student.name }}</span>
                 <span class="text-xl font-bold">{{ student.course }}</span><br>
             </div>

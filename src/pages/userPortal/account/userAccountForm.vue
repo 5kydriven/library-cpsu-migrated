@@ -62,6 +62,7 @@ async function checkStudentExistence() {
         } else {
             isNew.value = true
             console.log("not exist");
+            
         }
     } catch (error) {
         console.error("Error checking student existence: ", error);
@@ -106,7 +107,7 @@ async function onSubmit(e) {
         const { imageUrl } = await imageStore.useFirebaseStorage('students_image/', file.name);
         studentData.value.image = imageUrl;
 
-    } else{
+    } else if(!studentData.value.image){
         const { imageUrl } = await imageStore.useFirebaseStorage('students_image/', 'default.jpg');
         studentData.value.image = imageUrl;
         console.log("no file selected");

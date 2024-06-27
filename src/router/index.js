@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import authPage from '@/pages/index.vue';
 import { auth } from '@/stores/firebase';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { getCurrentUser } from 'vuefire';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -37,7 +38,7 @@ const router = createRouter({
       path: '/librarian',
       name: 'homepage',
       component: () => import('@/pages/librarian/index.vue'),
-      // meta: { requiresAuth: true, requiresLibrarian: true },
+      meta: { requiresAuth: true, requiresLibrarian: true },
       children: [
         {
           path: '',
@@ -85,7 +86,7 @@ async function getUserRole(userId) {
 router.beforeEach(async (to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const requiresLibrarian = to.matched.some(record => record.meta.requiresLibrarian);
-  const isAuthenticated = auth.currentUser;
+  const isAuthenticated = await getCurrentUser()
 
   if (requiresAuth && !isAuthenticated) {
     next('/');

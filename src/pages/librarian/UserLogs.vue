@@ -14,7 +14,7 @@ const initFilters = () => {
         name: { value: null },
         course: { value: null },
         studentId: { value: null },
-        date: { value: null}, // Use .value to get the computed value
+        date: { value: null }, // Use .value to get the computed value
     };
 };
 
@@ -54,8 +54,8 @@ onMounted(() => {
 <template>
     <h1 class="text-2xl font-bold mb-4">Student Time Records</h1>
     <DataTable :value="store.logs" tableStyle="min-width: 50rem" v-model:filters="filters"
-        :globalFilterFields="['name', 'course', 'studentId', 'year']" ref="dt" removableSort stripedRows scrollable
-        scrollHeight="400px" :loading="store.loading" :virtualScrollerOptions="{ itemSize: 46 }">
+        :globalFilterFields="['name', 'course', 'studentId', 'year', 'date']" ref="dt" removableSort stripedRows
+        scrollable scrollHeight="400px" :loading="store.loading" :virtualScrollerOptions="{ itemSize: 46 }">
         <template #header>
             <div class="flex justify-between">
                 <div class="flex gap-2">
