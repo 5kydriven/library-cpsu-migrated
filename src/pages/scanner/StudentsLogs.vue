@@ -151,6 +151,9 @@ async function onScanSuccess(decodeResult) {
                     status: 'OUT',
                 };
                 await crud.updateDocument('studentLogs', log.id, updatedRecord);
+                const timeout = setTimeout(()=>{
+                    reset();
+                }, 3000)
             }
         } else {
             isIN.value = true;
@@ -170,9 +173,13 @@ async function onScanSuccess(decodeResult) {
             };
 
             await crud.addDocument("studentLogs", record);
+            const timeout = setTimeout(()=>{
+                reset();
+            }, 3000)
         }
 
-        reset();
+        clearTimeout(timeout)
+
     } catch (error) {
         console.error(error);
         isLoading.value = false;
@@ -212,7 +219,6 @@ const play = () => {
                 </div>
                 {{ currentDate }}
                 {{time}}<br>
-                {{ dateFormat }}
                 <!-- <button @click="crud.deleteAllDocuments('studentLogs')"> Delete all</button> -->
             </div>
             <div class=" bg-white rounded-lg h-6/12 w-5/12 drop-shadow-sm"> 
