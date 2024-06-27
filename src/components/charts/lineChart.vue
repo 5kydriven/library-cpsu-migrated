@@ -1,26 +1,43 @@
 <template>
-    <Chart type="line" :data="chartData" :options="chartOptions" class="h-[400px]"/>
+    <Chart type="line" :data="chartData" :options="chartOptions" class="h-[400px]" />
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
-
-onMounted(() => {
-    chartData.value = setChartData();
-    chartOptions.value = setChartOptions();
-});
+import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "@/stores/firebase";
 
 const chartData = ref();
 const chartOptions = ref();
 
-const setChartData = () => {
+const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+];
 
+const fetchStudentLogs = async () => {
+    const q = query(collection(db, "studentLogs"), where("status", "==", "IN"));
+    const querySnapshot = await getDocs(q);
+
+    const monthCounts = new Array(12).fill(0);
+
+    querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const date = new Date(data.date);
+        const month = date.getMonth();
+        monthCounts[month]++;
+    });
+
+    return monthCounts;
+};
+
+const setChartData = (data) => {
     return {
-        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+        labels: months,
         datasets: [
             {
                 label: 'Overview Student Logs',
-                data: [65, 59, 80, 81, 56, 55, 40],
+                data: data,
                 fill: false,
                 borderColor: '#10b981',
                 tension: 0.4
@@ -28,6 +45,7 @@ const setChartData = () => {
         ]
     };
 };
+
 const setChartOptions = () => {
     return {
         maintainAspectRatio: false,
@@ -58,5 +76,11 @@ const setChartOptions = () => {
             }
         }
     };
-}
+};
+
+onMounted(async () => {
+    const monthCounts = await fetchStudentLogs();
+    chartData.value = setChartData(monthCounts);
+    chartOptions.value = setChartOptions();
+});
 </script>

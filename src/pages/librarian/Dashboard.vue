@@ -2,14 +2,14 @@
 import LineChart from '@/components/charts/lineChart.vue';
 import PieChart from '@/components/charts/pieChart.vue';
 import { useAdminStore } from '@/stores/adminStore';
-import { onMounted } from 'vue';
+import { onMounted, computed } from 'vue';
 
 const store = useAdminStore();
-
 
 onMounted(() => {
     store.fetchBooks();
     store.fetchStudents();
+    store.fetchBookLogs();
 })
 </script>
 
@@ -44,7 +44,7 @@ onMounted(() => {
         <div class="flex justify-between border shadow shadow-2 p-3 border-round">
             <div>
                 <span class="block text-xl font-medium mb-3">Borrowed Books</span>
-                <div class="text-gray-900 font-medium text-lg">2</div>
+                <div class="text-gray-900 font-medium text-lg">{{ store.totalBorrowedBooks }}</div>
             </div>
             <div class="flex items-center justify-center bg-primary-100 border-round"
                 style="width:2.5rem;height:2.5rem">
@@ -56,7 +56,7 @@ onMounted(() => {
         <div class="flex justify-between border shadow shadow-2 p-3 border-round">
             <div>
                 <span class="block text-xl font-medium mb-3">Book's Returned</span>
-                <div class="text-gray-900 font-medium text-lg">0</div>
+                <div class="text-gray-900 font-medium text-lg">{{ store.totalReturnedBooks }}</div>
             </div>
             <div class="flex items-center justify-center bg-primary-100 border-round"
                 style="width:2.5rem;height:2.5rem">

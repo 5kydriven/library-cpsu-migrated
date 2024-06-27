@@ -89,7 +89,9 @@ onMounted(() => {
         </Column>
         <Column header="Returned Date">
             <template #body="{ data }">
-                {{ formatTimestamp(data.dateReturned) }}
+                <div v-if="data.dateReturned != null">
+                    {{ formatTimestamp(data.dateReturned) }}
+                </div>
             </template>
         </Column>
         <Column header="Status">

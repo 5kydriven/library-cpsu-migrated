@@ -113,6 +113,14 @@ export const useAdminStore = defineStore('admin', () => {
     const totalStudents = computed(() => students.value.length);
     const totalBooks = computed(() => books.value.length);
 
+    const totalBorrowedBooks = computed(() => {
+        return bookLogs.value.filter(log => !log.isReturned).length;
+    });
+
+    const totalReturnedBooks = computed(() => {
+        return bookLogs.value.filter(log => log.isReturned).length;
+    });
+
     const borrowBook = async (student, book) => {
         loading.value = true;
         try {
@@ -199,6 +207,8 @@ export const useAdminStore = defineStore('admin', () => {
         fetchBookLogs,
         bookLogs,
         borrowBook,
-        returnBook
+        returnBook,
+        totalBorrowedBooks,
+        totalReturnedBooks
     };
 });
