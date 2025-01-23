@@ -4,13 +4,13 @@ import aura from './presets/aura';
 import 'material-icons/iconfont/material-icons.css';
 import 'primeicons/primeicons.css';
 
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
+import { createApp } from 'vue';
+import { createPinia } from 'pinia';
 import { firebaseApp } from './stores/firebase';
-import { VueFire, VueFireAuth } from 'vuefire'
+import { VueFire, VueFireAuth } from 'vuefire';
 
-import App from './App.vue'
-import router from './router'
+import App from './App.vue';
+import router from './router';
 
 // components
 import DataTable from 'primevue/datatable';
@@ -42,56 +42,52 @@ import FileUpload from 'primevue/fileupload';
 import Chart from 'primevue/chart';
 import AutoComplete from 'primevue/autocomplete';
 import Avatar from 'primevue/avatar';
+import Paginator from 'primevue/paginator';
 
+const app = createApp(App);
 
-
-const app = createApp(App)
-
-app.component('InputMask', InputMask)
-app.component('DataTable', DataTable)
-app.component('Column', Column)
-app.component('ColumnGroup', ColumnGroup)
-app.component('Row', Row)
-app.component('Calendar', Calendar)
-app.component('InputNumber', InputNumber)
-app.component('IconField', IconField)
-app.component('InputIcon', InputIcon)
-app.component('InputText', InputText)
-app.component('MultiSelect', MultiSelect)
-app.component('Button', Button)
-app.component('ProgressBar', ProgressBar)
-app.component('Tag', Tag)
-app.component('Dropdown', Dropdown)
-app.component('Slider', Slider)
-app.component('OverlayPanel', OverlayPanel)
-app.component('Toast', Toast)
-app.component('Dialog', Dialog)
-app.component('PanelMenu', PanelMenu)
-app.component('Splitter', Splitter)
-app.component('SplitterPanel', SplitterPanel)
-app.component('Skeleton', Skeleton)
-app.component('Carousel', Carousel)
-app.component('FileUpload', FileUpload)
-app.component('Chart', Chart)
-app.component('AutoComplete', AutoComplete)
-app.component('Avatar', Avatar)
+app.component('Paginator', Paginator);
+app.component('InputMask', InputMask);
+app.component('DataTable', DataTable);
+app.component('Column', Column);
+app.component('ColumnGroup', ColumnGroup);
+app.component('Row', Row);
+app.component('Calendar', Calendar);
+app.component('InputNumber', InputNumber);
+app.component('IconField', IconField);
+app.component('InputIcon', InputIcon);
+app.component('InputText', InputText);
+app.component('MultiSelect', MultiSelect);
+app.component('Button', Button);
+app.component('ProgressBar', ProgressBar);
+app.component('Tag', Tag);
+app.component('Dropdown', Dropdown);
+app.component('Slider', Slider);
+app.component('OverlayPanel', OverlayPanel);
+app.component('Toast', Toast);
+app.component('Dialog', Dialog);
+app.component('PanelMenu', PanelMenu);
+app.component('Splitter', Splitter);
+app.component('SplitterPanel', SplitterPanel);
+app.component('Skeleton', Skeleton);
+app.component('Carousel', Carousel);
+app.component('FileUpload', FileUpload);
+app.component('Chart', Chart);
+app.component('AutoComplete', AutoComplete);
+app.component('Avatar', Avatar);
 
 app.use(PrimeVue, {
-    unstyled: true,
-    pt: aura,
+	unstyled: true,
+	pt: aura,
 });
 
 app.use(ToastService);
-app.use(createPinia())
-app.use(router)
+app.use(createPinia());
+app.use(router);
 
 app.use(VueFire, {
-    firebaseApp: firebaseApp,
-    modules: [
-        // ... other modules
-        VueFireAuth(),
-    ],
-})
+	firebaseApp,
+	modules: [VueFireAuth()],
+});
 
-
-app.mount('#app')
+app.mount('#app');
