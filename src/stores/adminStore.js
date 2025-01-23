@@ -10,7 +10,6 @@ import {
 	serverTimestamp,
 	getDoc,
 	addDoc,
-	setDoc,
 } from 'firebase/firestore';
 import { ref, computed } from 'vue';
 import { db } from './firebase';

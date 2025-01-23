@@ -1,27 +1,28 @@
 <script setup>
 	import { ref, onMounted, onBeforeMount } from 'vue';
 	import { FilterMatchMode } from 'primevue/api';
-	import ImportBooks from '@/components/booksComp/ImportBooks.vue';
 	import { useToast } from 'primevue/usetoast';
-	import BookDetails from '@/components/booksComp/bookDetails.vue';
-	import CirculateForm from '@/components/booksComp/circulateBook.vue';
 	import { useAdminStore } from '@/stores/adminStore';
 	import EditForm from '@/components/booksComp/editForm.vue';
+	import Header from '@/pages/librarian/books/_components/Header.vue';
+	import Footer from '@/pages/librarian/books/_components/Footer.vue';
+	import { useColumnStore } from '@/stores/column.js';
+	import ImportDialog from '@/pages/librarian/books/_components/dialogs/ImportDialog.vue';
+	import CirculateDialog from '@/pages/librarian/books/_components/dialogs/CirculateDialog.vue';
+	import ViewDialog from '@/pages/librarian/books/_components/dialogs/ViewDialog.vue';
+	import EditDialog from '@/pages/librarian/books/_components/dialogs/EditDialog.vue';
 
+	const columnStore = useColumnStore();
 	const store = useAdminStore();
 
 	const toast = useToast();
 
 	const filters = ref();
 	// const dt = ref();
-	const dialogPosition = ref('center');
-	const dialogVisible = ref(false);
 	const op = ref();
 	const viewBook = ref(false);
-	const circulate = ref(false);
-	const selectedBook = ref(null); // New reactive variable to store selected book ID
+	const selectedBook = ref(null);
 	const selectedCustomer = ref();
-	const editDialog = ref(false);
 
 	const initFilters = () => {
 		filters.value = {
@@ -119,23 +120,13 @@
 	};
 
 	onBeforeMount(() => {
-		store.fetchColumns();
+		columnStore.fetchColumns();
 		store.fetchBooks();
 	});
 </script>
 
 <template>
-	<div class="flex justify-between items-center mb-4">
-		<h1 class="text-2xl font-bold">Books List</h1>
-		<MultiSelect
-			:modelValue="store.selectedColumns"
-			:loading="store.loading"
-			:options="store.columns"
-			optionLabel="header"
-			@update:modelValue="store.toggleColumnSelection"
-			display="chip"
-			placeholder="Select Columns" />
-	</div>
+	<Header />
 	<DataTable
 		:value="store.books"
 		tableStyle="min-width: 50rem"
@@ -159,14 +150,8 @@
 						icon="pi pi-file-export"
 						label="Export"
 						@click="exportAllCSV()" />
-					<Button
-						icon="pi pi-file-import"
-						label="Import"
-						@click="openDialog('top')" />
-					<Button
-						icon="pi pi-book"
-						label="Circulate Book"
-						@click="circulate = true" />
+					<ImportDialog @formSuccess="onFormSuccess" />
+					<CirculateDialog />
 				</div>
 
 				<div class="flex gap-2">
@@ -195,7 +180,7 @@
 		</Column>
 		<!-- <Column field="title" sortable header="Title"></Column> -->
 		<Column
-			v-for="(col, index) of store.selectedColumns"
+			v-for="(col, index) of columnStore.selectedColumns"
 			:field="col.field"
 			:header="col.header"
 			:key="col.field + '_' + index"
@@ -221,18 +206,12 @@
 						class="z-10 w-28 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
 						<ul class="py-1 text-sm text-gray-700 dark:text-gray-200">
 							<li>
-								<a
-									class="cursor-pointer block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-									@click="viewBook = true"
-									>View more</a
-								>
+								<ViewDialog :book="selectedBook" />
 							</li>
 							<li>
-								<a
-									@click="editDialog = true"
-									class="cursor-pointer block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-									>Edit</a
-								>
+								<EditDialog
+									:book="selectedBook"
+									@result="editResult" />
 							</li>
 						</ul>
 					</div>
@@ -240,50 +219,7 @@
 			</template>
 		</Column>
 	</DataTable>
-	<div>
-		<Paginator
-			:rows="10"
-			:totalRecords="120"
-			:rowsPerPageOptions="[10, 20, 30]"></Paginator>
-	</div>
-
-	<Dialog
-		v-model:visible="dialogVisible"
-		:style="{ width: '40rem' }"
-		:position="dialogPosition"
-		:draggable="false"
-		modal
-		header="Import File">
-		<ImportBooks @formSuccess="onFormSuccess" />
-	</Dialog>
-
-	<Dialog
-		v-model:visible="viewBook"
-		:draggable="false"
-		modal
-		header="Book Information">
-		<BookDetails :book="selectedBook" />
-	</Dialog>
-
-	<Dialog
-		v-model:visible="circulate"
-		:draggable="false"
-		modal
-		header="Modal"
-		:style="{ width: '25rem' }">
-		<CirculateForm />
-	</Dialog>
-
-	<Dialog
-		v-model:visible="editDialog"
-		modal
-		header="Edit Books"
-		:style="{ width: '35rem' }"
-		:draggable="false">
-		<EditForm
-			:book="selectedBook"
-			@result="editResult" />
-	</Dialog>
+	<Footer />
 
 	<Toast />
 </template>
